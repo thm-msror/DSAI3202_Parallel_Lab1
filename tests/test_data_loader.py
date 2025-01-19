@@ -1,4 +1,4 @@
-rom src.data_loader import load_data
+from src.data_loader import load_data
 def test_load_data():
     """
     Tests whether the dataset is loaded correctly and is not
