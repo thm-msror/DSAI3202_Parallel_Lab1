@@ -3,15 +3,20 @@ import time
 from src.generate_random import join_random_letters, add_random_numbers
 
 # Measure the total time for both operations
-def process_main():
+def process_main(num = 100000):
     total_start_time = time.time()
+    
+    start1 = 0
+    end1 = num// 2
+    start2 = num // 2
+    end2 = num
 
     # Create processes for letters and numbers
-    process_letters1 = multiprocessing.Process(target=join_random_letters)
-    process_letters2 = multiprocessing.Process(target=join_random_letters)
+    process_letters1 = multiprocessing.Process(target=join_random_letters, args=(start1, end1))
+    process_letters2 = multiprocessing.Process(target=join_random_letters, args=(start2, end2))
     
-    process_numbers1 = multiprocessing.Process(target=add_random_numbers)
-    process_numbers2 = multiprocessing.Process(target=add_random_numbers)
+    process_numbers1 = multiprocessing.Process(target=add_random_numbers, args=(start1, end1))
+    process_numbers2 = multiprocessing.Process(target=add_random_numbers, args=(start2, end2))
 
     # Start the processes
     process_letters1.start()

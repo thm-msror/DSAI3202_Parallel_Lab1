@@ -3,13 +3,13 @@ import time
 from src.generate_random import join_random_letters, add_random_numbers
 
 # Measure the total time for both operations
-def thread_main(num_letters = 10000, num_numbers = 10000):
+def thread_main(num = 100000):
     total_start_time = time.time()
     
     start1 = 0
-    end1 = num_letters//2
-    start2 = num_letters//2
-    end2 = num_letters
+    end1 = num//2
+    start2 = num//2
+    end2 = num
     
     # Create threads for letters generation and joining
     thread_letters1 = threading.Thread(target=join_random_letters, args =(start1, end1))
