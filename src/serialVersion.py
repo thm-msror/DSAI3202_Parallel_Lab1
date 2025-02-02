@@ -2,7 +2,7 @@ import time
 from src.generate_random import join_random_letters, add_random_numbers
 
 # Measure the total time for both operations
-def serial_main(end_letters= 100000):
+def serial_main(end_letters= 1000000):
     total_start_time = time.time()
     
     join_random_letters(end = end_letters)
