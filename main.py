@@ -20,7 +20,7 @@ thread_efficiency = compute_efficiency(thread_speedup, num_threads)
 process_efficiency = compute_efficiency(process_speedup, num_processes)
 
 # Example of parallel fraction (P) - this will depend on how much work can be parallelized
-parallel_fraction = 1 # 100% of the task can be parallelized in the programs 
+parallel_fraction = 0.64 # 64.28% of the task can be parallelized in the programs 
 
 # Use Amdahl's and Gustafson's laws for theoretical performance estimation
 amdahl_thread = amdahls_law(thread_speedup, parallel_fraction)
