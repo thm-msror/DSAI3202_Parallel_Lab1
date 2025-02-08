@@ -11,10 +11,11 @@ def process_main(num = 1000000):
     end2 = 2*num//3
     start3 = 2*num//3
     end3 = num
-    # Create processes for letters and numbers
+    # Create processes for letters
     process_letters1 = multiprocessing.Process(target=join_random_letters, args=(start1, end1))
     process_letters2 = multiprocessing.Process(target=join_random_letters, args=(start2, end2))
     process_letters3 = multiprocessing.Process(target=join_random_letters, args=(start3, end3))
+    # Create processes for numbers
     process_numbers1 = multiprocessing.Process(target=add_random_numbers, args=(start1, end1))
     process_numbers2 = multiprocessing.Process(target=add_random_numbers, args=(start2, end2))
     process_numbers3 = multiprocessing.Process(target=add_random_numbers, args=(start3, end3))

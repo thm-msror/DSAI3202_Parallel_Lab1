@@ -15,24 +15,28 @@ def test_compute_efficiency():
     Tests if efficiency is calculated correctly.
     """
     speedup = 2
-    num_units = 4
-    result = compute_efficiency(speedup, num_units)
+    np = 4
+    result = compute_efficiency(speedup, np)
     assert result == 0.5, f"Expected 0.5, got {result}"
+    
+#pytest.approx ensures that the test passes if the result is close to the expected value.
 
 def test_amdahls_law():
     """
     Tests if Amdahl's Law is calculated correctly.
     """
-    S, P = 10, 0.8
-    result = amdahls_law(S, P)
-    expected = 1 / ((1 - P) + (P / S))
-    assert result == pytest.approx(expected, rel=1e-9), f"Expected {expected}, got {result}"
-
+    np = 6  # Number of processors
+    P = 0.64  # Parallel fraction
+    expected_result = 1 / ((1 - P) + (P / np))  # Amdahl's Law formula
+    result = amdahls_law(np, P)
+    assert pytest.approx(result) == expected_result, f"Expected {expected_result}, got {result}"
 
 def test_gustafsons_law():
     """
     Tests if Gustafson's Law is calculated correctly.
     """
-    S, P = 10, 0.8
-    result = gustafsons_law(S, P)
-    assert result == 0.8 + 10 * (1 - 0.8), f"Expected {0.8 + 10 * (1 - 0.8)}, got {result}"
+    np = 6  # Number of processors
+    P = 0.64  # Parallel fraction
+    expected_result = np + (1 - P) * (1 - np)  # Gustafson's Law formula
+    result = gustafsons_law(np, P)
+    assert pytest.approx(result) == expected_result, f"Expected {expected_result}, got {result}"

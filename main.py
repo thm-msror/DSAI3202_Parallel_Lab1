@@ -20,14 +20,19 @@ thread_efficiency = compute_efficiency(thread_speedup, num_threads)
 process_efficiency = compute_efficiency(process_speedup, num_processes)
 
 # Example of parallel fraction (P) - this will depend on how much work can be parallelized
-parallel_fraction = 0.64 # 64.28% of the task can be parallelized in the programs 
+'''
+To calculate the parallel fraction P of a program 
+1. count the total number of lines in the program excluding imports, funtion definition (def), function return, comments, empty space lines = 38 - 11 = 27
+2. calculate parallel lines of code / total lines of code excluding the exclusions = 18 / 27 = 0.6666667 * 100 = 66.66 %
+'''
+parallel_fraction = 0.66 # 66.66% of the task can be parallelized in the programs
 
 # Use Amdahl's and Gustafson's laws for theoretical performance estimation
-amdahl_thread = amdahls_law(thread_speedup, parallel_fraction)
-amdahl_process = amdahls_law(process_speedup, parallel_fraction)
+amdahl_thread = amdahls_law(num_threads, parallel_fraction)
+amdahl_process = amdahls_law(num_processes, parallel_fraction)
 
-gustafson_thread = gustafsons_law(thread_speedup, parallel_fraction)
-gustafson_process = gustafsons_law(process_speedup, parallel_fraction)
+gustafson_thread = gustafsons_law(num_threads, parallel_fraction)
+gustafson_process = gustafsons_law(num_processes, parallel_fraction)
 
 # Print results
 print(f"\nThreading Speedup: {thread_speedup}")
