@@ -12,8 +12,8 @@ thread_speedup = compute_speedup(serial_time, thread_time)
 process_speedup = compute_speedup(serial_time, process_time)
 
 # Number of parallel units (e.g., number of threads or processes)
-num_threads = 6
-num_processes = 6
+num_threads = 10
+num_processes = 10
 
 # Compute efficiency for threading and multiprocessing
 thread_efficiency = compute_efficiency(thread_speedup, num_threads)
