@@ -43,10 +43,7 @@ To calculate the parallel fraction \( P \) of the program:
    - Empty lines
 
 2. Calculate the parallel lines of code:  
-   - **Parallel fraction (P)**:  
-     \[
-     P = \frac{\text{Parallel lines}}{\text{Total lines}}
-     \]
+   - **Parallel fraction (P)**:  Parallel lines / Total lines
 
 ---
 
