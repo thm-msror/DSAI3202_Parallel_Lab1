@@ -19,7 +19,6 @@ def thread_main(n=100_000_000, num_threads=10):
             end = n  # Ensure last thread covers remaining numbers
         thread = threading.Thread(target=thread_worker, args=(start, end))
         threads.append(thread)
-        print(f"Created thread for range {start} to {end}")
         thread.start()
     # Wait for all threads to finish
     for thread in threads:

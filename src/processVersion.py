@@ -19,7 +19,6 @@ def process_main(n=100_000_000, num_processes=10):
             end = n  # Ensure last process covers remaining numbers
         process = multiprocessing.Process(target=process_worker, args=(start, end, result_queue))
         processes.append(process)
-        print(f"Created process for range {start} to {end}")
         process.start()
     # Wait for all processes to finish
     for process in processes:
