@@ -10,7 +10,8 @@ def thread_main(n=100_000_000, num_threads=10):
     result_queue = queue.Queue()  # Using queue instead of list for thread-safe results
     # Worker function inside thread_main
     def thread_worker(start, end):
-        result_queue.put(compute_sum(start, end))  # Put the result into the queue
+        partial_sum = compute_sum(start, end)
+        result_queue.put(partial_sum) #keep adding the partial sums in the queue (FIFO)
     for i in range(num_threads):
         start = i * chunk_size + 1
         end = (i + 1) * chunk_size
@@ -18,6 +19,7 @@ def thread_main(n=100_000_000, num_threads=10):
             end = n  # Ensure last thread covers remaining numbers
         thread = threading.Thread(target=thread_worker, args=(start, end))
         threads.append(thread)
+        print(f"Created thread for range {start} to {end}")
         thread.start()
     # Wait for all threads to finish
     for thread in threads:
@@ -25,7 +27,8 @@ def thread_main(n=100_000_000, num_threads=10):
     # Collect all results from the queue
     total_sum = 0
     while not result_queue.empty():
-        total_sum += result_queue.get()
+        partial_sum = result_queue.get()
+        total_sum += partial_sum
     total_end_time = time.time()
     print(f"Execution time with threading: {total_end_time - total_start_time} seconds")
     print(f"Threaded Sum: {total_sum}")

@@ -6,10 +6,11 @@ def process_main(n=100_000_000, num_processes=10):
     total_start_time = time.time()
     chunk_size = n // num_processes
     processes = []
-    result_queue = multiprocessing.Queue()  # Queue for storing results
+    result_queue = multiprocessing.Queue()  # Creates a multiprocessing queue for inter-process communication.
     # Worker function inside process_main
     def process_worker(start, end, queue):
-        queue.put(compute_sum(start, end)) #Compute sum for given range (chunks) and puts it in the queue.
+        partial_sum = compute_sum(start, end)
+        queue.put(partial_sum) # adding the partial sums in the queue
     # Create and start processes
     for i in range(num_processes):
         start = i * chunk_size + 1
@@ -18,6 +19,7 @@ def process_main(n=100_000_000, num_processes=10):
             end = n  # Ensure last process covers remaining numbers
         process = multiprocessing.Process(target=process_worker, args=(start, end, result_queue))
         processes.append(process)
+        print(f"Created process for range {start} to {end}")
         process.start()
     # Wait for all processes to finish
     for process in processes:
@@ -25,7 +27,8 @@ def process_main(n=100_000_000, num_processes=10):
     # Compute total sum manually
     total_sum = 0
     for _ in range(num_processes):
-        total_sum += result_queue.get()
+        partial_sum = result_queue.get()
+        total_sum += partial_sum
     total_end_time = time.time()
     print(f"Execution time with multiprocessing: {total_end_time - total_start_time} seconds")
     print(f"Multiprocessing Sum: {total_sum}")  
