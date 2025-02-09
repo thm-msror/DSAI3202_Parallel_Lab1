@@ -1,12 +1,10 @@
 # DSAI 3202 – Parallel and Distributed Computing  
 ## Lab 3: Part 1 - Data Parallel Model
 ---
-
 ### Objectives
 - Build a data parallel model program using threads in Python.
 - Build a data parallel model program using processes in Python.
 - Understand the basics of parallel programming using Python's `threading` and `multiprocessing` modules.
-
 ---
 ## Q. Divide the range of numbers (1 to n) into multiple equal parts and assign each part to a separate thread (Hint: make sure to make a copy of each part). 
 ---
@@ -66,9 +64,6 @@ while not result_queue.empty():
     total_sum += partial_sum
 ```
 ---
-
----
-
 ### How does the execution time change when moving from sequential to threaded to multiprocessing implementations?
 
 The execution time typically changes as follows when moving from sequential to threaded to multiprocessing implementations:
