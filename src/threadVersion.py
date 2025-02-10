@@ -2,7 +2,7 @@ import threading
 import queue
 import time
 from src.sum_num import compute_sum
-def thread_main(n=100_000_000, num_threads=10):
+def thread_main(n=100_000_000, num_threads=6):
     """Divide the range into chunks, assign each to a thread, and compute the sum in parallel."""
     total_start_time = time.time()
     chunk_size = n // num_threads

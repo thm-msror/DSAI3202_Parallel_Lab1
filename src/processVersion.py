@@ -1,7 +1,7 @@
 import time
 import multiprocessing
 from src.sum_num import compute_sum
-def process_main(n=100_000_000, num_processes=10):
+def process_main(n=100_000_000, num_processes=6):
     """Divide the range into chunks, assign each to a process, and compute the sum in parallel."""
     total_start_time = time.time()
     chunk_size = n // num_processes
