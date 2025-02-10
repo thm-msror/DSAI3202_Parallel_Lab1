@@ -37,15 +37,25 @@ for i in range(num_threads):  # For threading
     print(f"Created thread for range {start} to {end}")
     thread.start()
 ```
-where thread_worker or process_worker function processes a specific chunk of data assigned to it, performing the designated task on that portion and makes a copy of each part
+where thread_worker or process_worker function processes a specific chunk of data assigned to it, performing the designated task on that portion
 ```python
 # Worker function inside thread_main
     def thread_worker(start, end):
-    # Create a local copy of the range (if needed)
-        local_range = range(start, end + 1)  # This creates a new range object for the thread
         partial_sum = compute_sum(start, end)
         result_queue.put(partial_sum) 
 ```
+This version creates a local copy of the range (from start to end) in local_range, and then manually sums the numbers within that range. After computing the sum, the result is added to the result_queue.
+```python
+# Worker function inside thread_main
+def thread_worker(start, end):
+    # Create a local copy of the range (if needed)
+    local_range = range(start, end + 1)  # This creates a new range object for the thread
+    partial_sum = 0
+    for number in local_range:
+        partial_sum += number  # Sum up the numbers in the local range
+    result_queue.put(partial_sum)
+```
+The second version (using local_range) can be useful if you need to work with the chunk in isolation (for example, if you want to modify the data without affecting other threads or processes). However, in the current context, if the compute_sum function handles summing the range correctly, the first version would be more efficient as it doesn't need the extra step of creating a range object and copying the data.
 
 ### 4. Handle the Last Thread or Process
 The last thread or process may have more numbers to sum if n is not perfectly divisible by the number of threads or processes. Ensure that the last chunk includes any remaining numbers.
