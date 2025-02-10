@@ -81,6 +81,19 @@ The execution time typically changes as follows when moving from sequential to t
 - **Threaded:** Often slower or similar to sequential due to Global Interpreter Lock (GIL) limitations.
 - **Multiprocessing:** Significantly faster for CPU-bound tasks, potentially cutting execution time by half or more.
 
+#### Key Takeaways
+**1. Threading:**
+- Not effective for CPU-bound tasks in Python due to the GIL.
+- Minimal speedup and low efficiency.
+
+**2. Multiprocessing:**
+- Highly effective for CPU-bound tasks.
+- Significant speedup and high efficiency.
+
+**3. Theoretical Laws:**
+- Amdahl’s Law and Gustafson’s Law provide theoretical upper bounds for speedup.
+- The actual speedup for multiprocessing exceeds these bounds because the laws assume fixed workload, whereas multiprocessing can scale the workload with the number of processors.
+
 ### Are there any performance differences between the threaded and multiprocessing versions?
 
 1.  **Regarding the difference between queue.Queue() and multiprocessing.Queue():**
