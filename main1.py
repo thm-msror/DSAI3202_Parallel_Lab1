@@ -35,8 +35,8 @@ process_efficiency = compute_efficiency(process_speedup, num_processes)
 '''
 To calculate the parallel fraction P of a program 
 1. count the total number of lines in the program excluding imports, funtion definition (def), function return, comments, empty space lines 
-= 65 - 24 = 41
-2. calculate parallel lines of code / total lines of code excluding the exclusions = 8 / 41 = 0.195 ~= 0.2
+= 74 - 34 = 40
+2. calculate parallel lines of code / total lines of code excluding the exclusions = 8 / 40 = 0.2
 '''
 parallel_fraction = 0.20 # 20% of the task can be parallelized in the threadVersion.py
 
