@@ -136,9 +136,9 @@ The execution time typically changes as follows when moving from sequential to t
 
 #### Thread Search and Process Search
 
--   Generates all possible combinations of hyperparameters.
--   Divides these combinations into chunks (21 combinations per chunk for 6 threads).
--   Creates multiple threads/processes(6 in your case).
+-   Generates all possible combinations of hyperparameters (7 * 3 * 6 = 126)
+-   Divides these combinations into chunks (chunk_size = 126 // 6 = 21, 21 combinations per chunk for 6 threads).
+-   Creates multiple threads/processes.
 
     Each thread/process:
 
