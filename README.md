@@ -134,7 +134,7 @@ The execution time typically changes as follows when moving from sequential to t
     -   Keeps track of the best-performing model (lowest RMSE).
     -   Returns the best hyperparameters and corresponding RMSE.
 
-#### Thread Search and Process Search
+#### Thread Search / Process Search:
 
 -   Generates all possible combinations of hyperparameters (7 * 3 * 6 = 126)
 -   Divides these combinations into chunks (chunk_size = 126 // 6 = 21, 21 combinations per chunk for 6 threads).
