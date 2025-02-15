@@ -120,3 +120,35 @@ The execution time typically changes as follows when moving from sequential to t
 2. **Multiprocessing:** Each process in multiprocessing runs in its own memory space, which bypasses the GIL and allows full parallelism on multiple CPU cores.
 
 ---
+## Lab 3: Part 2 -  Enhance the training of a Machine Learning Model
+---
+#### Serial Search:
+
+-   Generates all possible combinations of hyperparameters (`n_estimators`, `max_features`, `max_depth`).
+-   Iterates through each combination sequentially.
+
+    For each combination:
+
+    -   Trains a Random Forest model with the current hyperparameters.
+    -   Evaluates the model using RMSE.
+    -   Keeps track of the best-performing model (lowest RMSE).
+    -   Returns the best hyperparameters and corresponding RMSE.
+
+#### Thread Search and Process Search
+
+-   Generates all possible combinations of hyperparameters.
+-   Divides these combinations into chunks (21 combinations per chunk for 6 threads).
+-   Creates multiple threads/processes(6 in your case).
+
+    Each thread/process:
+
+    -   Processes its assigned chunk of hyperparameter combinations.
+
+        For each combination in its chunk:
+
+        -   Trains a Random Forest model.
+        -   Evaluates the model using RMSE.
+        -   Puts results into a shared queue.
+
+-   Main thread/process waits for all worker threads/processes to complete.
+-   Collects results from the queue and determines the best hyperparameters.
