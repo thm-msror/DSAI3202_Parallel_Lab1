@@ -1,74 +1,87 @@
 import time
-import multiprocessing
+from multiprocessing import Pool, Manager, Lock
 from src.model import train_model
 from src.evaluate import evaluate_model
-def process_search(X_train, X_val, y_train, y_val, num_processes=6):
-    # Record the start time
+
+def train_and_evaluate_chunk(params_chunk, X_train, X_val, y_train, y_val, results_queue, lock):
+    """
+    Trains and evaluates a chunk of models with the given parameters.
+    Results are stored in the shared results_queue with synchronization.
+    """
+    for params in params_chunk:
+        n_estimators, max_features, max_depth = params
+        model = train_model(X_train, y_train, n_estimators=n_estimators, max_features=max_features, max_depth=max_depth)
+        rmse, mape, r2 = evaluate_model(model, X_val, y_val)
+
+        # Use a lock to synchronize access to the results queue
+        with lock:
+            results_queue.put((params, rmse, mape, r2))
+
+# Fixed chunk size improves load balancing, reduces overhead, and ensures fault tolerance by distributing work evenly.
+def process_search(X_train, X_val, y_train, y_val, num_processes=6, chunk_size=10):
+    """
+    Performs hyperparameter tuning using multiprocessing with chunking.
+
+    Args:
+        X_train, X_val, y_train, y_val: Training and validation data.
+        num_processes (int): Number of processes to use.
+        chunk_size (int): Number of parameter combinations to process in each chunk.
+
+    Returns:
+        tuple: Execution time, best RMSE, best MAPE, best R², best parameters.
+    """
     start_time = time.time()
-    
-    # Define the hyperparameter ranges to search
+
+    # Define hyperparameter ranges
     n_estimators_range = [10, 25, 50, 100, 200, 300, 400]
     max_features_range = ['sqrt', 'log2', None]
     max_depth_range = [1, 2, 5, 10, 20, None]
-    
+
     # Generate all combinations of parameters
-    param_combinations = []
-    for n_estimators in n_estimators_range:
-        for max_features in max_features_range:
-            for max_depth in max_depth_range:
-                param_combinations.append((n_estimators, max_features, max_depth))
-   
-    # Calculate chunk size
-    n = len(param_combinations)
-    chunk_size = n // num_processes
-    
-    # Initialize list to store processes and a queue for results
-    processes = []
-    results_queue = multiprocessing.Queue()
+    param_combinations = [
+        (n_estimators, max_features, max_depth)
+        for n_estimators in n_estimators_range
+        for max_features in max_features_range
+        for max_depth in max_depth_range
+    ]
 
-    def process_worker(start, end, param_combinations, X_train, X_val, y_train, y_val, results_queue):
-        # Process a chunk of parameter combinations
-        for i in range(start, end):
-            params = param_combinations[i]
-            n_estimators, max_features, max_depth = params
-            # Train the model with the given hyperparameters
-            model = train_model(X_train, y_train, n_estimators=n_estimators, max_features=max_features, max_depth=max_depth)
-            # Evaluate the model and get the RMSE
-            rmse = evaluate_model(model, X_val, y_val)
-            # Put the results (parameters and RMSE) into the queue
-            results_queue.put((params, rmse))
+    # Use a Manager to create a process-safe queue and lock
+    manager = Manager()
+    results_queue = manager.Queue()
+    lock = manager.Lock()
 
-    # Create and start processes for each chunk
-    for i in range(num_processes):
-        start = i * chunk_size
-        if i < num_processes - 1:
-            end = (i + 1) * chunk_size
-        else:
-            end = n
-        process = multiprocessing.Process(target=process_worker, args=(start, end, param_combinations, X_train, X_val, y_train, y_val, results_queue))
-        processes.append(process)
-        process.start()
-        
-    # Wait for all processes to complete
-    for process in processes:
-        process.join()
-        
-    # Record the end time and calculate total time
-    end_time = time.time()
-    multiprocessing_time = end_time - start_time
-    
+    # Split parameter combinations into chunks
+    param_chunks = []
+    for i in range(0, len(param_combinations), chunk_size):
+        chunk = param_combinations[i:i + chunk_size]
+        param_chunks.append(chunk)
+
+    # Create a pool of workers
+    with Pool(processes=num_processes) as pool:
+        # Distribute the work among the processes
+        pool.starmap(
+            train_and_evaluate_chunk,
+            [(chunk, X_train, X_val, y_train, y_val, results_queue, lock) for chunk in param_chunks]
+        )
+
     # Collect results from the queue
-    results_list = []
+    results = []
     while not results_queue.empty():
-        results_list.append(results_queue.get())
-        
+        results.append(results_queue.get())
+
     # Find the best parameters (lowest RMSE)
     best_params = None
     best_rmse = float('inf')
-    for params, rmse in results_list:
+    best_mape = float('inf')
+    best_r2 = -float('inf')
+    for params, rmse, mape, r2 in results:
         if rmse < best_rmse:
             best_rmse = rmse
+            best_mape = mape
+            best_r2 = r2
             best_params = params
-            
-    # Return the execution time, best RMSE, and best parameters
-    return multiprocessing_time, best_rmse, {'n_estimators': best_params[0], 'max_features': best_params[1], 'max_depth': best_params[2]}
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    return execution_time, best_rmse, best_mape, best_r2, best_params

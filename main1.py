@@ -10,14 +10,14 @@ train_data_cleaned = load_data()
 X_train, X_val, y_train, y_val = split_data(train_data_cleaned)
 
 # Run searches
-serial_time, serial_rmse, serial_params = serial_search(X_train, X_val, y_train, y_val)
-thread_time, thread_rmse, thread_params = thread_search(X_train, X_val, y_train, y_val)
-process_time, process_rmse, process_params = process_search(X_train, X_val, y_train, y_val)
+serial_time, serial_rmse, serial_mape, serial_r2, serial_params = serial_search(X_train, X_val, y_train, y_val)
+thread_time, thread_rmse, thread_mape, thread_r2, thread_params = thread_search(X_train, X_val, y_train, y_val)
+process_time, process_rmse, process_mape, process_r2, process_params = process_search(X_train, X_val, y_train, y_val)
 
 # Print results
-print(f"Serial Search: Time = {serial_time:.2f}s, RMSE = {serial_rmse:.4f}, Params = {serial_params}")
-print(f"Thread Search: Time = {thread_time:.2f}s, RMSE = {thread_rmse:.4f}, Params = {thread_params}")
-print(f"Process Search: Time = {process_time:.2f}s, RMSE = {process_rmse:.4f}, Params = {process_params}")
+print(f"Serial Search: Time = {serial_time:.2f}s, RMSE = {serial_rmse:.4f}, MAPE = {serial_mape:.4f}%, R² = {serial_r2:.4f}, Params = {serial_params}")
+print(f"Thread Search: Time = {thread_time:.2f}s, RMSE = {thread_rmse:.4f}, MAPE = {thread_mape:.4f}%, R² = {thread_r2:.4f}, Params = {thread_params}")
+print(f"Process Search: Time = {process_time:.2f}s, RMSE = {process_rmse:.4f}, MAPE = {process_mape:.4f}%, R² = {process_r2:.4f}, Params = {process_params}")
 
 # Calculate speedups
 thread_speedup = compute_speedup(serial_time, thread_time)
@@ -31,14 +31,8 @@ num_processes = 6
 thread_efficiency = compute_efficiency(thread_speedup, num_threads)
 process_efficiency = compute_efficiency(process_speedup, num_processes)
 
-# Example of parallel fraction (P) - this will depend on how much work can be parallelized
-'''
-To calculate the parallel fraction P of a program 
-1. count the total number of lines in the program excluding imports, funtion definition (def), function return, comments, empty space lines 
-= 74 - 34 = 40
-2. calculate parallel lines of code / total lines of code excluding the exclusions = 8 / 40 = 0.2
-'''
-parallel_fraction = 0.20 # 20% of the task can be parallelized in the threadVersion.py
+# Example of parallel fraction (P)
+parallel_fraction = 0.21  
 
 # Use Amdahl's and Gustafson's laws for theoretical performance estimation
 amdahl_thread = amdahls_law(num_threads, parallel_fraction)

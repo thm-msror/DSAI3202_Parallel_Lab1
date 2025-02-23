@@ -32,6 +32,6 @@ def split_data(train_data_cleaned, test_size=0.30, random_state=42):
 
     # Handle missing values
     X_train_filled = X_train.fillna(X_train.median())
-    X_val_filled = X_val.fillna(X_val.median())
+    X_val_filled = X_val.fillna(X_train.median())  # Use X_train's median to avoid data leakage
 
     return X_train_filled, X_val_filled, y_train, y_val
