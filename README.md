@@ -134,21 +134,37 @@ The execution time typically changes as follows when moving from sequential to t
     -   Keeps track of the best-performing model (lowest RMSE).
     -   Returns the best hyperparameters and corresponding RMSE.
 
-#### Thread Search / Process Search:
+### Thread Search / Process Search
+- Hyperparameter Generation:
+  - Generates all possible combinations of hyperparameters (7 * 3 * 6 = 126 combinations).
+    
+- Chunking:
+    - Divide the 126 combinations into fixed-size chunks (e.g., chunk_size = total_combinations // num_workers).
+    - Each chunk contains a subset of combinations, ensuring even load balancing and reducing overhead.
+      
+- Worker Creation:
+    - Thread Search:
+          - Creates multiple threads using threading.Thread.
+          - Uses a thread-safe Queue to collect results.
+    - Process Search:
+          - Creates multiple processes using multiprocessing.
+          - Pool along with a Manager's Queue for safe inter-process communication.
+      
+- Chunk Processing:
+    - Each worker (thread or process) processes its assigned chunk by calling train_and_evaluate_chunk, which:
+    - Iterates through each hyperparameter combination in the chunk.
+    - Trains a Random Forest model using the provided hyperparameters.
+    - Evaluates the model (computing RMSE, MAPE, and R²).
+    - Tracks the local best hyperparameters (based on the lowest RMSE) for that chunk.
+    - Puts only the local best result into the shared queue.
+      
+- Result Aggregation:
+    - The main thread/process waits for all workers to complete (using join() for threads or pool.starmap()/join() for processes).
+    - Collects the local best results from the shared queue.
+    - Iterates through these results to determine the overall best hyperparameters across all chunks.
 
--   Generates all possible combinations of hyperparameters (7 * 3 * 6 = 126)
--   Divides these combinations into chunks (chunk_size = 126 // 6 = 21, 21 combinations per chunk for 6 threads).
--   Creates multiple threads/processes.
+- Key Benefits:
+    - Fixed Chunk Size: Improves load balancing, reduces memory and synchronization overhead, and enhances fault tolerance.
+    - Local Best Metrics: Each worker returns only its best result, which minimizes data transfer and simplifies final aggregation.
+    - Concurrency without Explicit Locks: Using thread/process-safe queues avoids the need for additional locks or synchronization.
 
-    Each thread/process:
-
-    -   Processes its assigned chunk of hyperparameter combinations.
-
-        For each combination in its chunk:
-
-        -   Trains a Random Forest model.
-        -   Evaluates the model using RMSE.
-        -   Puts results into a shared queue.
-
--   Main thread/process waits for all worker threads/processes to complete.
--   Collects results from the queue and determines the best hyperparameters.
