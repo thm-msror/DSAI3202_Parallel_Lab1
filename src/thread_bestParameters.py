@@ -4,20 +4,30 @@ from queue import Queue
 from src.model import train_model
 from src.evaluate import evaluate_model
 
-def train_and_evaluate_chunk(params_chunk, X_train, X_val, y_train, y_val, results_queue, lock):
+def train_and_evaluate_chunk(params_chunk, X_train, X_val, y_train, y_val, results_queue):
     """
-    Trains and evaluates a chunk of models with the given parameters.
-    Results are stored in the shared results_queue with synchronization.
+    Trains and evaluates a chunk of models, keeping track of the local best parameters.
+    Only the local best result is sent to the results_queue.
     """
+    local_best_params = None
+    local_best_rmse = float('inf')
+    local_best_mape = float('inf')
+    local_best_r2 = -float('inf')
+
     for params in params_chunk:
         n_estimators, max_features, max_depth = params
         model = train_model(X_train, y_train, n_estimators=n_estimators, max_features=max_features, max_depth=max_depth)
         rmse, mape, r2 = evaluate_model(model, X_val, y_val)
 
-        # Use a lock to synchronize access to the results queue
-        with lock:
-            results_queue.put((params, rmse, mape, r2))
-            
+        if rmse < local_best_rmse:
+            local_best_rmse = rmse
+            local_best_mape = mape
+            local_best_r2 = r2
+            local_best_params = params
+
+    # Send only the local best result to the queue
+    results_queue.put((local_best_params, local_best_rmse, local_best_mape, local_best_r2))
+
 # Fixed chunk size improves load balancing, reduces overhead, and ensures fault tolerance by distributing work evenly.
 def thread_search(X_train, X_val, y_train, y_val, num_threads=6, chunk_size=10):
     """
@@ -46,41 +56,20 @@ def thread_search(X_train, X_val, y_train, y_val, num_threads=6, chunk_size=10):
         for max_depth in max_depth_range
     ]
 
-    # Create a thread-safe queue and lock
+    # Create a thread-safe queue
     results_queue = Queue()
-    lock = Lock()
 
     # Split parameter combinations into chunks
-    param_chunks = []
-    for i in range(0, len(param_combinations), chunk_size):
-        chunk = param_combinations[i:i + chunk_size]
-        param_chunks.append(chunk)
-
-    # Function to process tasks from the queue
-    def worker():
-        while not task_queue.empty():
-            chunk = task_queue.get()
-            train_and_evaluate_chunk(chunk, X_train, X_val, y_train, y_val, results_queue, lock)
-            task_queue.task_done()
-
-    # Create a queue for tasks
-    task_queue = Queue()
-    for chunk in param_chunks:
-        task_queue.put(chunk)
+    param_chunks = [param_combinations[i:i + chunk_size] for i in range(0, len(param_combinations), chunk_size)]
 
     # Create and start threads
     threads = []
-    for _ in range(num_threads):
-        thread = Thread(target=worker)
-        thread.start()
+    for chunk in param_chunks:
+        thread = Thread(target=train_and_evaluate_chunk, args=(chunk, X_train, X_val, y_train, y_val, results_queue))
         threads.append(thread)
+        thread.start()
 
-    # Wait for all tasks to be processed
-    task_queue.join()
-
-    # Stop the worker threads
-    for _ in range(num_threads):
-        task_queue.put(None)  # Sentinel value to stop workers
+    # Wait for all threads to finish
     for thread in threads:
         thread.join()
 
@@ -89,7 +78,7 @@ def thread_search(X_train, X_val, y_train, y_val, num_threads=6, chunk_size=10):
     while not results_queue.empty():
         results.append(results_queue.get())
 
-    # Find the best parameters (lowest RMSE)
+    # Find the overall best parameters (lowest RMSE)
     best_params = None
     best_rmse = float('inf')
     best_mape = float('inf')
