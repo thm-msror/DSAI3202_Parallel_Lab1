@@ -25,18 +25,16 @@
 
 ## Analysis:
 - Explain your parallelization
-  - In the parallel execution, the task of processing images is divided into chunks, and each chunk is processed by a separate process using Python's ProcessPoolExecutor.
-  - This allows multiple images to be processed concurrently, utilizing multiple CPU cores, which significantly speeds up the overall execution time.
-  - The images are processed in parallel by splitting the work into manageable chunks.
-  - Results are accumulated in shared memory lists managed by the Manager from the multiprocessing module.
-  - Progress is tracked using tqdm to monitor the status of each chunk's processing.
+  - The program uses parallelization through the ProcessPoolExecutor from the concurrent.futures module to distribute image processing tasks across multiple CPU cores.
+  - Each image is processed independently by a separate worker, and the work is divided into chunks to optimize resource utilization.
+  - The results from each chunk are collected and merged using a shared list managed by Manager, ensuring thread-safe updates across processes.
     
 - Analyze the speedup and efficiency of the parallel execution. Discuss the results and any trade-offs encountered.
-  - The parallel execution achieved a speedup of approximately 4.04, meaning it was about four times faster than the sequential execution for the same task.
-  - This substantial reduction in time demonstrates the benefit of parallelization, where multiple CPU cores process images concurrently.
-  - However, the efficiency, calculated as 0.67, indicates that for each process, only 67% of the CPU's potential is utilized, which suggests some overhead from process management and shared resource handling.
-  - While parallelization provides a performance boost, this comes at the cost of slightly reduced efficiency and increased memory usage, as multiple processes require their own memory space and coordination.
-
+  - Speedup: Parallel execution achieved a significant reduction in processing time compared to the sequential version, as tasks were distributed across multiple processors.
+      - This speedup is a direct result of parallelizing independent operations (image processing) that could be performed concurrently without data dependency.
+  - Efficiency: The efficiency of parallelization, measured as speedup divided by the number of processors, shows room for improvement.
+      - While the processing time was reduced, the efficiency is less than ideal due to overhead introduced by managing multiple processes, task scheduling, and shared memory access.
+      - If the dataset grows significantly, the efficiency may decrease further because of this overhead, leading to diminishing returns from additional parallel workers.
 
 
 
