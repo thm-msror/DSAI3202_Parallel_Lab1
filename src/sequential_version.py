@@ -12,7 +12,7 @@ def process_images(images):
         - processed_images (list): List of dictionaries containing filtered images.
     """
     processed_images = []
-    for image in tqdm(images[:5]):  # Process only the first 5 images for testing
+    for image in tqdm(images):  # Process all images
         filtered_images = apply_filters(image)
         processed_images.append(filtered_images)
     return processed_images

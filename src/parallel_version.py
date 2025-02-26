@@ -1,3 +1,4 @@
+# parallel_version.py
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager, cpu_count
