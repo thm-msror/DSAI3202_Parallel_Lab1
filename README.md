@@ -7,9 +7,12 @@
 ---
 ## Q1) Which synchronization metric did you use for each task? 
 ---
-
+- Sensor Simulation: Condition and RLock for updating latest_temperatures and notifying threads.
+- Data Processing: Condition and RLock for updating temperature_averages and notifying threads.
+- Display Logic: Condition and RLock for refreshing the display without race conditions.
 ---
 ## Q2) Why did the professor not ask you to compute metrics?
 ---
-
-
+- The lab focuses on parallelism and synchronization, not statistical analysis, to keep the learning objectives clear and straightforward.
+- The lab emphasizes real-time updates and synchronization, which are more relevant to parallel and distributed computing than statistical metrics.
+- Adding metrics would increase complexity without adding significant educational value.
