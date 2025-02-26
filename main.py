@@ -1,7 +1,7 @@
 import time
 import threading
 from src.display import initialize_display, update_display
-from src.thread_version import start_threads
+from src.thread_version import start_threads, condition
 
 if __name__ == "__main__":
     # Start all sensor and processing threads
@@ -10,7 +10,7 @@ if __name__ == "__main__":
     # Initialize and update the display
     initialize_display()
 
-    display_thread = threading.Thread(target=update_display, daemon=True)
+    display_thread = threading.Thread(target=update_display, args=(condition,), daemon=True)
     display_thread.start()
 
     # Keep main program running

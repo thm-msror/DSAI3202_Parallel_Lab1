@@ -14,16 +14,18 @@ def initialize_display():
         avg_temp = temperature_averages.get(sensor, "--")
         print(f"Sensor {sensor} Average: {avg_temp}°C")
 
-def update_display():
+def update_display(condition):
     """Continuously updates temperature readings and averages."""
     while True:
-        print("\nCurrent temperatures:")
-        
-        for sensor, temp in latest_temperatures.items():
-            print(f"Sensor {sensor}: {temp}°C", end=" ")
-        print("\n")
-        
-        for sensor, avg in temperature_averages.items():
-            print(f"Sensor {sensor} Average: {avg:.2f}°C")
+        with condition:
+            condition.wait(timeout=1)  # Wait for updates
+            
+            print("\nCurrent temperatures:")
+            for sensor, temp in latest_temperatures.items():
+                print(f"Sensor {sensor}: {temp}°C", end=" ")
+            print("\n")
+            
+            for sensor, avg in temperature_averages.items():
+                print(f"Sensor {sensor} Average: {avg:.2f}°C")
         
         time.sleep(5)
