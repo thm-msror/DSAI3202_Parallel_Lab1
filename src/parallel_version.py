@@ -1,4 +1,3 @@
-# parallel_version.py
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager, cpu_count
@@ -63,9 +62,9 @@ def parallel_execution(yes_images, no_images, max_workers=None, chunk_size=10):
         for future in tqdm(as_completed(yes_futures + no_futures), total=len(yes_futures) + len(no_futures), desc="Parallel Processing"):
             result = future.result()
             if future in yes_futures:
-                yes_results.extend(result)
+                yes_results.extend(result)  # Safely extend shared list with the results
             else:
-                no_results.extend(result)
+                no_results.extend(result)  # Safely extend shared list with the results
 
     execution_time = time.time() - start_time
     return execution_time, list(yes_results), list(no_results)
