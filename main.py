@@ -13,13 +13,13 @@ def main():
     yes_images, no_images = load_dataset(dataset_path)
     
     # Sequential execution (for testing)
-    print("Running sequential version for 5 images...")
+    print("Running sequential version for images...")
     seq_time = sequential_execution(yes_images, no_images)
     print(f"Sequential execution time: {seq_time:.2f} seconds")
     
     # Parallel execution (for testing)
-    print("Running parallel version for 5 images...")
-    par_time, yes_results, no_results = parallel_execution(yes_images, no_images, max_workers=cpu_count(), chunk_size=25)
+    print("Running parallel version for images...")
+    par_time, yes_results, no_results = parallel_execution(yes_images, no_images, max_workers=cpu_count())
     print(f"Parallel execution time: {par_time:.2f} seconds")
     
     # Calculate speedup and efficiency
