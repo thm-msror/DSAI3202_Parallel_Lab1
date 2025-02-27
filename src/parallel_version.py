@@ -1,7 +1,7 @@
 # parallel_version.py
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from preprocessing import apply_filters
+from src.preprocessing import apply_filters
 from multiprocessing import cpu_count
 from tqdm import tqdm
 import math
