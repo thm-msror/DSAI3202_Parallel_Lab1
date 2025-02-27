@@ -5,6 +5,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+
+def split_data(dataframe):
+    """Splits data into training and testing sets."""
+    X = dataframe.drop(columns=['target'])  # Adjust 'target' based on your dataset
+    y = dataframe['target']
+    return train_test_split(X, y, test_size=0.2, random_state=42)
 
 def train_and_evaluate_models(X_train, X_test, y_train, y_test):
     """Optimized models with hyperparameter tuning and parallel training"""
