@@ -27,7 +27,7 @@ def process_chunk(images):
     """
     return [process_image(img) for img in images]
 
-def parallel_execution(yes_images, no_images, max_workers=None, chunk_size=10):
+def parallel_execution(yes_images, no_images, max_workers=None, chunk_size=25):
     """
     Executes the parallel version of the pipeline using ProcessPoolExecutor.
 
