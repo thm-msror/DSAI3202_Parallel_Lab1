@@ -2,6 +2,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.model_selection import GridSearchCV
 
 def split_data(dataframe):
     """
@@ -19,16 +20,31 @@ def split_data(dataframe):
     return X_train, X_test, y_train, y_test
 
 def train_and_evaluate_models(X_train, X_test, y_train, y_test):
-    """Trains and evaluates multiple machine learning models."""
+    """Optimized with full hyperparameter tuning"""
+    # RandomForest with extended search
+    rf_param_grid = {
+        'n_estimators': [200, 300, 400],
+        'max_depth': [None, 15, 20],
+        'min_samples_split': [2, 5],
+        'max_features': ['sqrt', 'log2']
+    }
+    
+    # SVM with RBF kernel tuning
+    svm_param_grid = {
+        'C': [0.1, 1, 10, 100],
+        'gamma': ['scale', 'auto', 0.001, 0.01]
+    }
+    
     models = {
-        'RandomForest': RandomForestClassifier(n_estimators=200, max_depth=10, n_jobs=-1),
-        'SVM': SVC(kernel='rbf', C=10, gamma='scale', probability=True)
+        'RandomForest': GridSearchCV(RandomForestClassifier(), rf_param_grid, cv=5, n_jobs=-1),
+        'SVM': GridSearchCV(SVC(kernel='rbf'), svm_param_grid, cv=5, n_jobs=-1)
     }
     
     results = {}
     for name, model in models.items():
         model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
+        best_model = model.best_estimator_
+        y_pred = best_model.predict(X_test)
         results[name] = {
             'accuracy': accuracy_score(y_test, y_pred),
             'precision': precision_score(y_test, y_pred),
