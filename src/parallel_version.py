@@ -1,4 +1,3 @@
-# parallel_version.py
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from src.preprocessing import apply_filters
