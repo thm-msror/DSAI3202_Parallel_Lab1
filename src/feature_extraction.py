@@ -4,7 +4,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import skimage.feature as feature
 from skimage.feature import hog
 from multiprocessing import cpu_count
-import tqdm
+from tqdm import tqdm  # Corrected import
 
 def compute_glcm_features(args):
     """Compute GLCM features."""
@@ -62,7 +62,7 @@ def create_dataframe(yes_inputs, no_inputs):
             futures.append(executor.submit(process_batch, [(img, 0) for img in batch]))
         
         results = []
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Feature Extraction"):
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Feature Extraction"):  # Corrected usage
             results.extend(future.result())
     
     return pd.DataFrame(results).sample(frac=1)
