@@ -6,26 +6,30 @@ from tqdm import tqdm
 import math
 
 def process_chunk(chunk):
+    """Process a chunk of images using list comprehension"""
     return [apply_filters(img) for img in chunk]
 
-def parallel_execution(yes_images, no_images, max_workers=None, chunk_size=10):
+def parallel_execution(yes_images, no_images, max_workers=None, chunk_size=None):
     """
-    Optimized version with better chunking and reduced overhead
+    Optimized parallel execution with dynamic chunk sizing and reduced overhead
     """
     start_time = time.time()
     max_workers = max_workers or cpu_count()
     
     # Combine datasets for balanced processing
     all_images = yes_images + no_images
-    labels = [1]*len(yes_images) + [0]*len(no_images)
+    labels = [1] * len(yes_images) + [0] * len(no_images)
     
-    # Dynamic chunk sizing based on worker count
-    chunk_size = max(1, math.ceil(len(all_images) / (max_workers * 2)))
-    chunks = [all_images[i:i+chunk_size] for i in range(0, len(all_images), chunk_size)]
+    # Dynamic chunk sizing based on worker count and dataset size
+    total_images = len(all_images)
+    chunk_size = chunk_size or max(1, math.ceil(total_images / (max_workers * 2)))
+    chunks = [all_images[i:i + chunk_size] for i in range(0, total_images, chunk_size)]
     
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks first
         futures = {executor.submit(process_chunk, chunk): i for i, chunk in enumerate(chunks)}
         
+        # Collect results with progress bar
         results = []
         with tqdm(total=len(chunks), desc="Processing") as pbar:
             for future in as_completed(futures):
