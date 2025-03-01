@@ -31,7 +31,7 @@ def compute_hog_features(image):
         pixels_per_cell=(8, 8),
         cells_per_block=(2, 2),
         visualize=True,
-        multichannel=False
+        channel_axis=None  # Use None for grayscale images
     )
     return features
 
@@ -57,7 +57,6 @@ def process_single_image(args):
 def process_batch(batch):
     """Process a batch of images"""
     return [process_single_image((img, label)) for img, label in batch]
-    
 
 def create_dataframe(yes_inputs, no_inputs):
     """Create DataFrame with enhanced features."""
