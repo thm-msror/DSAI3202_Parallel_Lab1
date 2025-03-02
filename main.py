@@ -7,7 +7,7 @@ from src.feature_extraction import create_dataframe
 from src.model_training import train_and_evaluate
 
 def print_metrics(results):
-    """Display formatted metrics"""
+    """Display formatted metrics for each model."""
     print("\nModel Performance Summary:")
     for model, metrics in results.items():
         print(f"\n{model}:")
@@ -23,35 +23,38 @@ def main():
     # Load dataset
     dataset_path = 'data/brain_tumor_dataset/'
     yes_images, no_images = load_dataset(dataset_path)
-
-    # Parallel processing
-    print("\nRunning parallel version...")
+    
+    # Sequential execution for baseline (optional)
+    print("Running sequential version for image filtering...")
+    seq_time, yes_seq, no_seq = sequential_execution(yes_images, no_images)
+    print(f"Sequential execution time: {seq_time:.2f} seconds")
+    
+    # Parallel processing for image filtering
+    print("\nRunning parallel version for image filtering...")
     par_time, yes_par, no_par = parallel_execution(
         yes_images, no_images,
         max_workers=cpu_count()-1,
         chunk_size=10
     )
-    print(par_time)
-
+    print(f"Parallel execution time: {par_time:.2f} seconds")
+    speedup = seq_time / par_time
+    efficiency = speedup / (cpu_count()-1)
+    print(f"Speedup: {speedup:.2f}x")
+    print(f"Efficiency: {efficiency:.2f}")
+    
     # Feature extraction
     print("\nCreating feature dataframe...")
     df = create_dataframe(yes_par, no_par)
-
-    # Check if DataFrame is empty
-    if df.empty:
-        print("Error: Feature dataframe is empty. Exiting.")
-        return
-
     print(f"Final dataframe shape: {df.shape}")
     print(f"Memory usage: {df.memory_usage().sum()/1024/1024:.2f} MB")
-
-    # Model training
+    
+    # Model training and evaluation
     print("\nTraining models...")
     try:
         results = train_and_evaluate(df)
         print_metrics(results)
-    except IndexError as e:
-        print(f"Model training failed due to an error: {e}")
+    except Exception as e:
+        print(f"Model training failed due to error: {e}")
 
 if __name__ == "__main__":
     main()

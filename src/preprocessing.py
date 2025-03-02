@@ -1,4 +1,3 @@
-# preprocessing.py
 from skimage.filters.rank import entropy
 from skimage.morphology import disk
 from scipy import ndimage as nd
@@ -7,11 +6,11 @@ from skimage.filters import sobel, gabor, hessian, prewitt
 def apply_filters(image):
     """
     Applies filters to a single image.
-
+    
     Parameters:
-        - image: Input image.
+        image: Input image.
     Returns:
-        - filtered_images (dict): Dictionary of filtered images.
+        filtered_images (dict): Dictionary of filtered images.
     """
     filtered_images = {
         'Original': image,
