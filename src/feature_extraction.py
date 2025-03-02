@@ -1,86 +1,63 @@
 import numpy as np
 import pandas as pd
+from skimage.feature import graycomatrix, graycoprops, hog
 from concurrent.futures import ProcessPoolExecutor, as_completed
-import skimage.feature as feature
-from skimage.feature import hog, local_binary_pattern
-from multiprocessing import cpu_count
 from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 
-def compute_glcm_features(args):
-    """Compute GLCM features."""
-    image, filter_name = args
-    image = (image * 255).astype(np.uint8)
-    graycom = feature.graycomatrix(
-        image, 
-        distances=[1, 3, 5],  # Added more distances
-        angles=[0, np.pi/4, np.pi/2, 3*np.pi/4],
-        levels=256,
-        symmetric=True
-    )
-    features = {}
-    for prop in ['contrast', 'dissimilarity', 'homogeneity', 'energy', 'correlation']:
-        values = feature.graycoprops(graycom, prop).flatten()
-        features.update({f'{filter_name}_{prop}_{i}': v for i, v in enumerate(values)})
-    return features
-
-def compute_hog_features(image):
-    """Compute HOG features."""
-    features, _ = hog(
-        image,
-        pixels_per_cell=(8, 8),
-        cells_per_block=(2, 2),
-        visualize=True,
-        channel_axis=None  # Use None for grayscale images
-    )
-    return features
-
-def compute_lbp_features(image):
-    """Compute Local Binary Patterns (LBP) features."""
-    lbp = local_binary_pattern(image, P=8, R=1, method="uniform")
-    hist, _ = np.histogram(lbp, bins=np.arange(0, 10), range=(0, 9))
-    hist = hist.astype("float")
-    hist /= (hist.sum() + 1e-6)  # Normalize histogram
-    return hist
-
-def process_single_image(args):
-    """Process a single image with GLCM, HOG, and LBP features."""
-    filtered_images, tumor_presence = args
-    features = {}
-    for key, img in filtered_images.items():
-        features.update(compute_glcm_features((img, key)))
-        features.update({f'{key}_hog': compute_hog_features(img)})
-        features.update({f'{key}_lbp': compute_lbp_features(img)})
-    features['Tumor'] = tumor_presence
-    return features
-
-def process_batch(batch):
-    """Process a batch of images"""
-    return [process_single_image((img, label)) for img, label in batch]
+def compute_features(args):
+    """Robust feature computation with error handling"""
+    try:
+        filtered_images, label = args
+        features = {}
+        
+        for filter_name, img in filtered_images.items():
+            # GLCM Features
+            img_uint8 = (img * 255).astype(np.uint8)
+            glcm = graycomatrix(img_uint8, [1], [0], 256, symmetric=True)
+            features.update({
+                f'{filter_name}_contrast': graycoprops(glcm, 'contrast')[0,0],
+                f'{filter_name}_energy': graycoprops(glcm, 'energy')[0,0]
+            })
+            
+            # HOG Features
+            hog_feat = hog(img, pixels_per_cell=(32,32), cells_per_block=(2,2))
+            features[f'{filter_name}_hog_mean'] = hog_feat.mean()
+            features[f'{filter_name}_hog_std'] = hog_feat.std()
+            
+        features['Tumor'] = label
+        return features
+    except Exception as e:
+        print(f"Skipping image due to error: {str(e)[:100]}")
+        return None
 
 def create_dataframe(yes_inputs, no_inputs):
-    """Create DataFrame with enhanced features."""
-    with ProcessPoolExecutor(cpu_count()) as executor:
-        # Process in batches of 20 images
-        batch_size = 20
-        yes_batches = [yes_inputs[i:i + batch_size] for i in range(0, len(yes_inputs), batch_size)]
-        no_batches = [no_inputs[i:i + batch_size] for i in range(0, len(no_inputs), batch_size)]
-        
+    """Create dataframe with progress tracking"""
+    with ProcessPoolExecutor() as executor:
+        # Submit all tasks
         futures = []
-        for batch in yes_batches:
-            futures.append(executor.submit(process_batch, [(img, 1) for img in batch]))
-        for batch in no_batches:
-            futures.append(executor.submit(process_batch, [(img, 0) for img in batch]))
+        for img in yes_inputs:
+            futures.append(executor.submit(compute_features, (img, 1)))
+        for img in no_inputs:
+            futures.append(executor.submit(compute_features, (img, 0)))
         
+        # Collect results with progress bar
         results = []
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Feature Extraction"):
-            results.extend(future.result())
+        for future in tqdm(as_completed(futures), total=len(futures), 
+                         desc="Feature Extraction"):
+            result = future.result()
+            if result is not None:
+                results.append(result)
     
-    # Convert to DataFrame and normalize features
-    dataframe = pd.DataFrame(results)
+    # Create and validate dataframe
+    df = pd.DataFrame(results).dropna()
+    if df.empty:
+        raise ValueError("No valid features extracted - check input data")
+    
+    # Normalize features
     scaler = StandardScaler()
-    X = dataframe.drop(columns=['Tumor'])
-    X_scaled = scaler.fit_transform(X)
-    dataframe[X.columns] = X_scaled
+    X = scaler.fit_transform(df.drop('Tumor', axis=1))
+    df_normalized = pd.DataFrame(X, columns=df.columns[:-1])
+    df_normalized['Tumor'] = df['Tumor'].values
     
-    return dataframe.sample(frac=1)
+    return df_normalized.sample(frac=1)
