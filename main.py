@@ -28,7 +28,7 @@ def main():
     #print("Running sequential version for image filtering...")
     #seq_time, yes_seq, no_seq = sequential_execution(yes_images, no_images)
     #print(f"Sequential execution time: {seq_time:.2f} seconds")
-    seq_time = 8350.83
+    seq_time = 8410.79
     
     # Parallel processing for image filtering
     print("\nRunning parallel version for image filtering...")
@@ -39,7 +39,7 @@ def main():
     )
     print(f"Parallel execution time: {par_time:.2f} seconds")
     speedup = seq_time / par_time
-    efficiency = speedup / (cpu_count()-1)
+    efficiency = speedup / (cpu_count())
     print(f"Speedup: {speedup:.2f}x")
     print(f"Efficiency: {efficiency:.2f}")
     
