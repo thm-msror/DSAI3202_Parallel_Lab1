@@ -25,9 +25,9 @@ def main():
     yes_images, no_images = load_dataset(dataset_path)
     
     # Sequential execution for baseline (optional)
-    print("Running sequential version for image filtering...")
-    seq_time, yes_seq, no_seq = sequential_execution(yes_images, no_images)
-    print(f"Sequential execution time: {seq_time:.2f} seconds")
+    #print("Running sequential version for image filtering...")
+    #seq_time, yes_seq, no_seq = sequential_execution(yes_images, no_images)
+    #print(f"Sequential execution time: {seq_time:.2f} seconds")
     
     # Parallel processing for image filtering
     print("\nRunning parallel version for image filtering...")
@@ -37,10 +37,10 @@ def main():
         chunk_size=10
     )
     print(f"Parallel execution time: {par_time:.2f} seconds")
-    speedup = seq_time / par_time
-    efficiency = speedup / (cpu_count()-1)
-    print(f"Speedup: {speedup:.2f}x")
-    print(f"Efficiency: {efficiency:.2f}")
+    #speedup = seq_time / par_time
+    #efficiency = speedup / (cpu_count()-1)
+    #print(f"Speedup: {speedup:.2f}x")
+    #print(f"Efficiency: {efficiency:.2f}")
     
     # Feature extraction
     print("\nCreating feature dataframe...")

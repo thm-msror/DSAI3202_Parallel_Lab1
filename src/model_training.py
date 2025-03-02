@@ -1,8 +1,7 @@
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
 from joblib import Parallel, delayed
@@ -70,10 +69,10 @@ def train_and_evaluate(df):
     # Define models with pipelines and hyperparameter tuning for SVM.
     models = {
         'RandomForest': make_pipeline(StandardScaler(), 
-                                        RandomForestClassifier(n_estimators=300, max_depth=12, n_jobs=-1, random_state=42)),
-        'XGBoost': make_pipeline(StandardScaler(),
-                                 XGBClassifier(n_estimators=200, max_depth=6, learning_rate=0.05, 
-                                               colsample_bytree=0.8, n_jobs=-1, random_state=42, tree_method='hist')),
+                                     RandomForestClassifier(n_estimators=300, max_depth=12, n_jobs=-1, random_state=42)),
+        'GradientBoosting': make_pipeline(StandardScaler(),
+                                          GradientBoostingClassifier(n_estimators=200, max_depth=6, learning_rate=0.05, 
+                                                                    subsample=0.8, random_state=42)),
         'SVM': make_pipeline(StandardScaler(), SVC(kernel='rbf', probability=True, random_state=42))
     }
     
