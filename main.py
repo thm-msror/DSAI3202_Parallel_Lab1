@@ -17,7 +17,9 @@ def print_metrics(results):
         print(f"F1-Score: {metrics['f1']:.4f}")
         print(f"ROC-AUC: {metrics['roc_auc']:.4f}")
         print("Confusion Matrix:")
-        print(metrics['confusion_matrix'])
+        # Format the confusion matrix as a 2x2 array
+        print(f"[{metrics['confusion_matrix'][0][0]} {metrics['confusion_matrix'][0][1]}]")
+        print(f"[{metrics['confusion_matrix'][1][0]} {metrics['confusion_matrix'][1][1]}]")
 
 def main():
     # Load dataset
@@ -44,15 +46,21 @@ def main():
     
     # Feature extraction
     print("\nCreating feature dataframe...")
+    start_feature_extraction = time.time()
     df = create_dataframe(yes_par, no_par)
+    feature_extraction_time = time.time() - start_feature_extraction
     print(f"Final dataframe shape: {df.shape}")
     print(f"Memory usage: {df.memory_usage().sum()/1024/1024:.2f} MB")
+    print(f"Time taken for feature extraction: {feature_extraction_time:.2f} seconds")
     
     # Model training and evaluation
     print("\nTraining models...")
     try:
+        start_training = time.time()
         results = train_and_evaluate(df)
+        training_time = time.time() - start_training
         print_metrics(results)
+        print(f"Time taken for model training: {training_time:.2f} seconds")
     except Exception as e:
         print(f"Model training failed due to error: {e}")
 
