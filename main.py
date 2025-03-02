@@ -34,8 +34,8 @@ def main():
     print("\nRunning parallel version for image filtering...")
     par_time, yes_par, no_par = parallel_execution(
         yes_images, no_images,
-        max_workers=cpu_count()-1,
-        chunk_size=10
+        max_workers=cpu_count(),
+        chunk_size=15
     )
     print(f"Parallel execution time: {par_time:.2f} seconds")
     speedup = seq_time / par_time
