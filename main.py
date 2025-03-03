@@ -17,9 +17,10 @@ def print_metrics(results):
         print(f"F1-Score: {metrics['f1']:.4f}")
         print(f"ROC-AUC: {metrics['roc_auc']:.4f}")
         print("Confusion Matrix:")
-        # Format the confusion matrix as a 2x2 array
-        print(f"[{metrics['confusion_matrix'][0][0]} {metrics['confusion_matrix'][0][1]}]")
-        print(f"[{metrics['confusion_matrix'][1][0]} {metrics['confusion_matrix'][1][1]}]")
+        # Ensure confusion_matrix is a 2D array and print it in the desired format
+        cm = metrics['confusion_matrix']
+        print(f"[{cm[0][0]} {cm[0][1]}]")
+        print(f"[{cm[1][0]} {cm[1][1]}]")
 
 def main():
     # Load dataset
