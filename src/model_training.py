@@ -97,10 +97,15 @@ def train_and_evaluate(df):
             for k, v in metrics.items():
                 results[name][k].append(v)
     
-    # Average the metrics across folds
+    # Average the metrics across folds, except for the confusion matrix
     for model in results:
         for metric in results[model]:
-            results[model][metric] = np.mean(results[model][metric])
+            if metric == 'confusion_matrix':
+                # Sum the confusion matrices across folds
+                results[model][metric] = np.sum(results[model][metric], axis=0)
+            else:
+                # Average other metrics
+                results[model][metric] = np.mean(results[model][metric])
     
     # Debug: Print the structure of results
     print("Results structure:", results)
