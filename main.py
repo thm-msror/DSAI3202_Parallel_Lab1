@@ -5,6 +5,7 @@ from src.sequential_version import sequential_execution
 from src.parallel_version import parallel_execution
 from src.feature_extraction import create_dataframe
 from src.model_training import train_and_evaluate
+import numpy as np
 
 def print_metrics(results):
     """Display formatted metrics for each model."""
@@ -19,8 +20,11 @@ def print_metrics(results):
         print("Confusion Matrix:")
         # Ensure confusion_matrix is a 2D array and print it in the desired format
         cm = metrics['confusion_matrix']
-        print(f"[{cm[0][0]} {cm[0][1]}]")
-        print(f"[{cm[1][0]} {cm[1][1]}]")
+        if isinstance(cm, np.ndarray) and cm.ndim == 2:  # Check if it's a 2D array
+            print(f"[{cm[0, 0]} {cm[0, 1]}]")
+            print(f"[{cm[1, 0]} {cm[1, 1]}]")
+        else:
+            print("Confusion matrix is not in the expected 2D format.")
 
 def main():
     # Load dataset

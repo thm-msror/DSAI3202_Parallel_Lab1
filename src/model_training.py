@@ -102,4 +102,7 @@ def train_and_evaluate(df):
         for metric in results[model]:
             results[model][metric] = np.mean(results[model][metric])
     
+    # Debug: Print the structure of results
+    print("Results structure:", results)
+    
     return results
