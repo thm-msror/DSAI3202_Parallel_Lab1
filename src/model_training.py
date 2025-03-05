@@ -116,7 +116,7 @@ def train_and_evaluate(df):
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
         
         # Train models in parallel using joblib
-        fold_results = Parallel(n_jobs=2)(  # Use 2 parallel jobs
+        fold_results = Parallel(n_jobs=3)(  # Use 3 parallel jobs
             delayed(train_model)(name, model, X_train, X_test, y_train, y_test)  # Train each model
             for name, model in models.items()
         )
