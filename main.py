@@ -1,6 +1,6 @@
 from mpi4py import MPI
 import numpy as np
-from src.square import square
+from src.calculate_squares import square
 import time
 import random
 
