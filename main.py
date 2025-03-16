@@ -14,10 +14,6 @@ def run_tests(size):
     _, time_seq = sequential_execution(numbers)
     print(f"Sequential execution: {time_seq:.4f} seconds")
 
-    # Multiprocessing with individual processes
-    _, time_mp_loop = multiprocessing_execution(numbers)
-    print(f"Multiprocessing (loop): {time_mp_loop:.4f} seconds")
-
     # Multiprocessing pool (map & map_async)
     _, time_mp_map, time_mp_map_async = multiprocessing_pool_map(numbers)
     print(f"Multiprocessing pool (map): {time_mp_map:.4f} seconds")

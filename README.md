@@ -14,6 +14,7 @@
     - The multiprocessing loop creating a process for each number crashes the first time with a memory error and gets killed the next execution if we try to run the program again.
     - ![Memory error caused due to multiprocessing loop for each number](memory_error.png)
     - ![Program Killed Shown due to multiprocessing loop for each number](killed_error.png)
+    - Therefore, we cannot create a process for each number because it leads to excessive memory allocation and process overhead, making it impractical, so we remove the execution of multiprocessing_loop.py from main.py
 - Redo the test with 10^7 numbers. 
 - Test both synchronous and asynchronous versions in the pool. 
 - What are your conclusions?
