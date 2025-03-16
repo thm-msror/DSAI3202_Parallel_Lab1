@@ -11,7 +11,7 @@
     - A multiprocessing pool with both map() and apply().
     - A concurrent.futures ProcessPoolExecutor.
 - What are your conclusions?
-    - The multiprocessing loop with a process for each number crashes the first time with an error and gets killed the next exection if we try to run it.
+    - The multiprocessing loop creating a process for each number crashes the first time with a memory error and gets killed the next execution if we try to run the program again.
     - ![Memory error caused due to multiprocessing loop for each number](memory_error.png)
     - ![Program Killed Shown due to multiprocessing loop for each number](killed_error.png)
 - Redo the test with 10^7 numbers. 
