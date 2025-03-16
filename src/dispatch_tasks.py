@@ -2,7 +2,7 @@ from src.tasks import power
 
 def dispatch():
     results_objs = [
-        power.apply_async((number, 2) for number in range(1, 10001)) #list comprehension
+        power.apply_async((number, 2)) for number in range(1, 10001) #list comprehension
     ]
     results = [
         result.get() for result in results_objs
