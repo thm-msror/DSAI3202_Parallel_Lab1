@@ -1,3 +1,5 @@
+import numpy as np
+
 # Virus spread function
 def spread_virus(population, spread_chance, vaccination_rate):
     new_population = population.copy()
