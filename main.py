@@ -1,39 +1,32 @@
 from mpi4py import MPI
 import numpy as np
-from src.calculate_squares import square
+from src.calculate_squares import compute_squares
 import time
-import random
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-print(f"The process is of rank {rank}, and the size is {size}")
+# Define n (can modify for 1e8 later)
+n = 10**6  
 
+# Split workload among processes
+chunk_size = n // size
+start_idx = rank * chunk_size
+end_idx = (rank + 1) * chunk_size if rank != size - 1 else n
+
+# Start timing
+start_time = time.time()
+
+# Compute squares for the assigned range
+local_squares = compute_squares(start_idx, end_idx)
+
+# Gather results at the root process
+squares = comm.gather(local_squares, root=0)
+
+# Root process combines results and prints stats
 if rank == 0:
-    #create a vector of numbers
-    numbers = np.arange(size, dtype="i")
-    print(numbers)
-else:
-    numbers = None
-print(numbers)
-
-#Create a vector of zeros
-number = np.zeros(1, dtype="i")
-#Scatter is broadcasting rank 0 distributes the data (numbers and number) to all other processes or machines, and one process takes one number
-comm.Scatter(numbers, number, root=0)
-print(numbers)
-print(number)
-
-result = square(number[0])
-print(result)
-time.sleep(random.randint(1, 10))
-request = comm.isend(result, dest=0, tag=rank)
-
-if rank == 0:
-    results = np.zeros(size, dtype="i")
-    for i in range(size):
-        results[i] = comm.irecv(source=i, tag=i).wait() #create the request and wait
-    print(f"The results are: {results}") 
-
-#request.wait() #wait for all the request to be done like thread.join()
+    squares = np.concatenate(squares)
+    print(f"Total squares computed: {len(squares)}")
+    print(f"Last square: {squares[-1]}")
+    print(f"Time taken: {time.time() - start_time:.2f} seconds")
