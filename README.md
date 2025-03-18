@@ -4,8 +4,8 @@
 
 ---
 ## Fleet management using genetic algorithms:  
-## One car version, completing the sequential code
-
+## Sequential Version
+---
 - Q. Explain the program outlined in the script genetic_algorithm_trial.py. 
 **The main overview:**
 - The script `genetic_algorithm_trial.py` implements a Genetic Algorithm (GA) to solve the Fleet Management Problem. 
@@ -41,3 +41,5 @@
 - Scalability:
     - The algorithm is computationally expensive due to the large population size (10,000) and the number of generations (200). 
     - Parallelization could significantly reduce the execution time.
+---
+## Parallel Version
