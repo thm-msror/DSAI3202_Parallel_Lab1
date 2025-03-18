@@ -21,15 +21,15 @@ def calculate_fitness(route,
         node2 = route[i + 1]
         distance = distance_matrix[node1, node2]
         
-        # If the distance is 100,000 (infeasible route), return a penalty.
-        if distance == 100000:
+        # If the distance is 10,000 (infeasible route), return a penalty.
+        if distance == 10000:
             return -1e6
         
         total_distance += distance
     
     # Add the leg from the last node back to the depot (node 0) to complete the route.
     last_leg_distance = distance_matrix[route[-1], 0]
-    if last_leg_distance == 100000:
+    if last_leg_distance == 10000:
         return -1e6
     total_distance += last_leg_distance
     
