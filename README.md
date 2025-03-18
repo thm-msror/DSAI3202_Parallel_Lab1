@@ -3,7 +3,7 @@
 ### Objectives: Develop Python programs that take advantage of Python's multiprocessing capabilities.
 ---
 
-### Square Program
+## Square Program
 - Create a function `square` that computes the square of an integer.
 - Create a list of 10<sup>6</sup> numbers.
 - Time the program in these scenarios on the random list:
@@ -31,3 +31,25 @@
 
 ---
 
+## Process Synchronization with Semaphores
+### Overview
+In order to experiment on how to use semaphores in Python’s multiprocessing 
+module to manage access to a limited pool of resources. Implement a ConnectionPool class that simulates a pool of database connections, using a semaphore to control access. 
+- Create a ConnectionPool class with methods to get and release connections, 
+using a semaphore to limit access. 
+- Write a function that simulates a process performing a database operation by 
+acquiring and releasing a connection from the pool. 
+- Observe how the semaphore ensures that only a limited number of processes 
+can access the pool at any given time.
+### Instructions
+----
+1. Create the ConnectionPool Class
+2. Implement the Database Operation Function
+3. Set Up Multiprocessing
+----
+4. Discuss Observations
+- What happens if more processes try to access the pool than there are available 
+connections? 
+- How does the semaphore prevent race conditions and ensure safe access to the 
+connections?
+---

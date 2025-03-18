@@ -1,5 +1,4 @@
 import random
-import time
 from src.sequential import sequential_execution
 from src.multiprocessing_pool import multiprocessing_pool_map, multiprocessing_pool_apply
 from src.concurrent_executor import concurrent_execution
