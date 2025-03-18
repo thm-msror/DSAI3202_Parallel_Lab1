@@ -46,10 +46,26 @@ can access the pool at any given time.
 1. Create the ConnectionPool Class
 2. Implement the Database Operation Function
 3. Set Up Multiprocessing
+![Semaphore Simulation Program Run](semaphore-simulation.png)
+- We have a connection pool (collection of database connections) with 3 connections (e.g., [0, 1, 2]).
+- We have 10 processes [0-9] that all need to use a connection from the pool.
+- We have the semaphore initialized with a count of 3, meaning only 3 processes can acquire a connection at a time.
 ----
 4. Discuss Observations
 - What happens if more processes try to access the pool than there are available 
 connections? 
-- How does the semaphore prevent race conditions and ensure safe access to the 
-connections?
+    - The order of execution would be:
+    i. The order in which processes acquire and release connections is non-deterministic (unpredictable) because it depends on how the operating system schedules the processes.
+    ii. Processes 0, 1, and 2 acquire the 3 available connections. The semaphore count drops to 0, meaning no more connections are available.
+    iii. Processes 3-9 try to acquire a connection but find that the semaphore count is 0. These processes wait (block) until a connection becomes available.
+    iv. When a process finishes its work (e.g., after sleeping to simulate work), it releases the connection back to the pool. The semaphore count is incremented, and one of the waiting processes can now acquire the released connection.
+    - This happens because semaphore ensures that only the allowed number of processes (equal to the pool size) can access the pool at any time preventing resource exhaustion. 
+- How does the semaphore prevent race conditions and ensure safe access to the connections?
+    - A race condition occurs when multiple processes try to access a shared resource in our case the connection pool, 10 processes trying to access 3 connection pools would cause resource exhaustion and the connection pool would become inconsistent and corrupted.
+    - The semaphore acts as a counter that tracks the number of available connections.
+    - Its atomic operations (acquire() and release()) ensure that only upto 3 processes can acquire or release a connection at a time.
+        - When a process acquires a connection, the semaphore count is decremented.
+        - When a process releases a connection, the semaphore count is incremented.
+        - This ensures that no more than 3 processes can access the connection pool simultaneously.
+    - This prevents race conditions and ensures that the connection pool is accessed safely.
 ---

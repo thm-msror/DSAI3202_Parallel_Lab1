@@ -2,6 +2,7 @@ import random
 from src.sequential import sequential_execution
 from src.multiprocessing_pool import multiprocessing_pool_map, multiprocessing_pool_apply
 from src.concurrent_executor import concurrent_execution
+from src.semaphore_simulation import run_semaphore_simulation
 
 def run_tests(size):
     """Runs all execution methods and prints performance."""
@@ -24,3 +25,4 @@ def run_tests(size):
 if __name__ == "__main__":
     run_tests(10**6)
     run_tests(10**7)
+    run_semaphore_simulation()
