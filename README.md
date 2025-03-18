@@ -42,11 +42,11 @@ acquiring and releasing a connection from the pool.
 - Observe how the semaphore ensures that only a limited number of processes 
 can access the pool at any given time.
 ### Instructions
---
+----
 1. Create the ConnectionPool Class
 2. Implement the Database Operation Function
 3. Set Up Multiprocessing
---
+----
 4. Discuss Observations
 - What happens if more processes try to access the pool than there are available 
 connections? 
