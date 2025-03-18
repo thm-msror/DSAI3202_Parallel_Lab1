@@ -19,7 +19,7 @@
 - Redo the test with 10<sup>7</sup> numbers.
 - Test both synchronous and asynchronous versions in the pool.
 - What are your conclusions?
-    - ![The program run for squaring numbers using pooling and process pool executor](part1-squareprogram_run.png)
+    - ![The program run for squaring numbers using pooling and process pool executor](squareprogram_run.png)
     - From the results, we can see that:
         - **Sequential execution** is the most efficient for small inputs and simple programs like squaring 10<sup>6</sup> and 10<sup>7</sup> numbers.
         - **Multiprocessing Pool Synchronous version** using `map()` is more efficient compared to `apply()` since `apply()` creates a new process per call, which introduces significant overhead and slows down the execution.
@@ -28,6 +28,6 @@
         - **Multiprocessing Pooling using both synchronous and asynchronous methods** shows that `apply_async()` is more efficient in scenarios where non-blocking behavior is beneficial, as it reduces idle time and makes better use of system resources.
         - **Multiprocessing execution using `concurrent.futures.ProcessPoolExecutor`** is the most efficient among the tested methods. This is because `ProcessPoolExecutor` provides a high-level interface for asynchronously executing callables, managing a pool of processes, and efficiently distributing tasks among them, leading to improved performance.
         - **On a side note, chunking improved both pooling and process pool executor performance in terms of time** since it reduces the frequency of communicaton between processes by grouping tasks together, leading to fewer process management operation for pooling and it allows for better scheduling of tasks across worker, especially in asynchronous execution reducing the overall overhead calls for managing individual tasks for process pool executor.
-        
+
 ---
 
