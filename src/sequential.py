@@ -6,4 +6,4 @@ def sequential_execution(numbers):
     start_time = time.time()
     results = [square(n) for n in numbers]
     end_time = time.time()
-    return results, end_time - start_time
+    return end_time - start_time
