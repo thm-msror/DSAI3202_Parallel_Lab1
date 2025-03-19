@@ -9,7 +9,7 @@ def run_genetic_algorithm(distance_matrix, population_size=10000, num_tournament
                           mutation_rate=0.1, num_generations=200, infeasible_penalty=1e6, 
                           stagnation_limit=5, seed=42):
     """
-    Runs a Genetic Algorithm (GA) for the Traveling Salesman Problem (TSP).
+    Runs a Genetic Algorithm (GA) for the Fleet Management Problem
 
     Parameters:
         distance_matrix (np.array): Distance matrix representing the cities.

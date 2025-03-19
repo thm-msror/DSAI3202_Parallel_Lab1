@@ -4,6 +4,7 @@ import time
 from src.genetic_algorithms_functions import calculate_fitness, select_in_tournament, order_crossover, mutate, generate_unique_population
 from src.performance_metrics import calculate_speedup, calculate_efficiency, amdahl_speedup, gustafson_speedup
 from src.genetic_algorithm_trial import run_genetic_algorithm
+from src.genetic_algorithm_parallel import run_parallel_ga
 
 def main():
     # Load the distance matrix
@@ -25,6 +26,13 @@ def main():
     # Print results
     print("Performance Metrics:")
     print(f"  Sequential Time: {sequential_time:.4f} seconds")
+    
+    # Run the MPI-based Genetic Algorithm
+    parallel_time = run_parallel_ga(distance_matrix)
+    
+    # Only the master process (rank 0) will return a valid execution time.
+    if parallel_time is not None:
+        print("Parallel Execution Time: {:.4f} seconds".format(parallel_time))
 
 if __name__ == "__main__":
     main()
