@@ -27,7 +27,9 @@ def main():
     print("Performance Metrics:")
     print(f"  Sequential Time: {sequential_time:.4f} seconds")
     
-    # Run the MPI-based Genetic Algorithm
+    # Run the GA using multiprocessing (parallelism)
+    
+    # Run the MPI-based Genetic Algorithm (distributed)
     parallel_time = run_parallel_ga(distance_matrix)
     
     # Only the master process (rank 0) will return a valid execution time.

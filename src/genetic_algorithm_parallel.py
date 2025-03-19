@@ -1,4 +1,4 @@
-# src/mpi_genetic_algorithm.py
+# src/genetic_algorithm_parallel.py
 from mpi4py import MPI
 import numpy as np
 import time
@@ -32,7 +32,7 @@ def run_parallel_ga(distance_matrix, population_size=10000, num_tournaments=4,
         local_population = comm.scatter(pop_split, root=0)
         
         # Each process calculates fitness for its local population.
-        local_fitness = np.array([calculate_fitness(route, distance_matrix) for route in local_population])
+        local_fitness = np.array([-calculate_fitness(route, distance_matrix) for route in local_population])
         
         # Gather fitness values at the master.
         fitness_sublists = comm.gather(local_fitness, root=0)
@@ -89,7 +89,7 @@ def run_parallel_ga(distance_matrix, population_size=10000, num_tournaments=4,
     
     if rank == 0:
         total_time = time.time() - start_time
-        best_solution = population[np.argmin(np.array([calculate_fitness(route, distance_matrix) for route in population]))]
+        best_solution = population[np.argmin(np.array([-calculate_fitness(route, distance_matrix) for route in population]))]
         print("Best Solution:", best_solution)
         print("Total Distance:", calculate_fitness(best_solution, distance_matrix))
         return total_time
