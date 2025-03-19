@@ -39,7 +39,7 @@ def run_genetic_algorithm(distance_matrix, population_size=10000, num_tournament
     # Main GA loop
     for generation in range(num_generations):
         # Evaluate calculate_fitness
-        calculate_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+        calculate_fitness_values = np.array([-calculate_fitness(route, distance_matrix) for route in population])
 
         # Check for stagnation
         current_best_calculate_fitness = np.min(calculate_fitness_values)

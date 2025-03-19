@@ -34,7 +34,7 @@ def calculate_fitness(route,
     total_distance += last_leg_distance
     
     # Return negative total distance because we want to minimize the distance.
-    return total_distance
+    return -total_distance
 
 
 def select_in_tournament(population,
