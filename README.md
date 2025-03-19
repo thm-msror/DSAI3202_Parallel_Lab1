@@ -17,7 +17,7 @@ Q. Explain the program outlined in the script genetic_algorithm_trial.py.
 1. A unique population of routes is generated using the generate_unique_population function.
 Each route starts and ends at the depot (node 0) and is a permutation of the remaining nodes.
 2. The fitness of each route is calculated using the calculate_fitness function. 
-- The fitness is the negative total distance of the route (since the goal is to minimize distance). 
+- The fitness is the total distance of the route (the goal is to minimize distance). 
 - A large negative penalty is returned if the route is infeasible (e.g., contains a distance of 10,000).
 3. The select_in_tournament function implements tournament selection. 
 - It randomly selects a subset of individuals from the population and chooses the one with the best fitness to be a parent for the next generation.
@@ -33,13 +33,16 @@ In each generation, it evaluates the population's fitness, performs selection, c
 
 Q. Run and time the execution of this script.
 - ![Sequential run of fleet management using GA](run_sequential.png)
-- The execution time for the sequential version of the algorithm (as shown in the output) is 19.8276 seconds. This time may vary depending on the hardware and the size of the distance matrix.
+- The execution time for the sequential version of the algorithm (as shown in the output) is 19.6252 seconds. This time may vary depending on the hardware and the size of the distance matrix.
 - Stagnation Handling:
     - The algorithm frequently regenerates the population due to stagnation, indicating that it struggles to find better solutions after a few generations. 
     - This suggests that the search space is complex, and the algorithm may benefit from additional optimization techniques.
 - Fitness Improvement:
-    - The best fitness improves over time, but the improvements are incremental. 
-    - The final best fitness is -1800547.0, which corresponds to a total distance of 1,800,547 units.
+    - The best fitness improves over time, but the improvements are incremental:
+        - Initially, the best fitness is 1395.0 (Generation 0).
+        - After the first regeneration at Generation 5, the best fitness improves to 1278.0 (Generation 6).
+        - Later, at Generation 92, the best fitness further improves to 1224.0, which remains the best solution until the end of the run.
+    - The final best fitness is 1224.0, which corresponds to a total distance of 1224 units.
 - Scalability:
     - The algorithm is computationally expensive due to the large population size (10,000) and the number of generations (200). 
     - Parallelization could significantly reduce the execution time.
