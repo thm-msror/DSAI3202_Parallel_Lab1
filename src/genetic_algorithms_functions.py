@@ -34,7 +34,7 @@ def calculate_fitness(route,
     total_distance += last_leg_distance
     
     # Return negative total distance because we want to minimize the distance.
-    return -total_distance
+    return total_distance
 
 
 def select_in_tournament(population,
@@ -62,7 +62,6 @@ def select_in_tournament(population,
         # Randomly select tournament_size unique indices from the population.
         idx = np.random.choice(population_size, tournament_size, replace=False)
         # Identify the index with the highest fitness score among the selected individuals.
-        # (Since fitness is negative total distance, a higher value (closer to zero) is better.)
         best_idx = idx[np.argmax(scores[idx])]
         # Append the best individual from this tournament to the selected list.
         selected.append(population[best_idx])
