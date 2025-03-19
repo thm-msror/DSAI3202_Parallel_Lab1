@@ -20,21 +20,25 @@ if rank == 0:
     infected_indices = np.random.choice(population_size, int(0.1 * population_size), replace=False)
     population[infected_indices] = 1  # Infect 10% of the population
 
+# Broadcast the initial population from rank 0 to all processes
+population = comm.bcast(population, root=0)
+
 # Simulate virus spread over 10 time steps
 for t in range(10):
     population = spread_virus(population, spread_chance, vaccination_rate)
     
-    if rank != 0:
-        comm.send(population, dest=0)  # Send data to root
-    else:
-        # Root process gathers data from all processes
-        all_populations = [population]
-        for i in range(1, size):
-            received_data = comm.recv(source=i)
-            all_populations.append(received_data)
-        
+    # Gather all populations at rank 0
+    all_populations = comm.gather(population, root=0)
+    
+    if rank == 0:
         # Combine the populations from all processes
-        population = np.sum(all_populations, axis=0)
+        combined_population = np.zeros_like(population)
+        for p in all_populations:
+            combined_population = np.logical_or(combined_population, p).astype(int)
+        population = combined_population
+    
+    # Broadcast the updated population back to all processes
+    population = comm.bcast(population, root=0)
 
 # Calculate infection rate for each process
 total_infected = np.sum(population)
