@@ -68,4 +68,7 @@ connections?
         - When a process releases a connection, the semaphore count is incremented.
         - This ensures that no more than 3 processes can access the connection pool simultaneously.
     - This prevents race conditions and ensures that the connection pool is accessed safely.
+    - Lock:
+        - Ensures that only one process can modify the connection list at a time, preventing race conditions.
+        - Without the lock, multiple processes could attempt to modify the connection list simultaneously, leading to inconsistencies.
 ---

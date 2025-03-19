@@ -1,16 +1,12 @@
 from multiprocessing import Process
-from src.connection_pool import ConnectionPool
 from src.database_operations import access_database
+from src.connection_pool import ConnectionPool
 
 def run_semaphore_simulation():
-    """Runs the semaphore simulation for database connections."""
-    print("\nRunning semaphore simulation for database connections...")
-
-    # Create a connection pool with 3 connections
-    pool = ConnectionPool(3)
-
-    # Create 10 processes to simulate concurrent access
+    pool = ConnectionPool(size=3)  # Create a connection pool with 3 connections
     processes = []
+
+    # Create 10 processes
     for i in range(10):
         p = Process(target=access_database, args=(pool, i))
         processes.append(p)
