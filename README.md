@@ -7,6 +7,7 @@
 ## Sequential Version
 ---
 Q. Explain the program outlined in the script genetic_algorithm_trial.py. 
+
 **The main overview:**
     - The script `genetic_algorithm_trial.py` implements a Genetic Algorithm (GA) to solve the Fleet Management Problem. 
     - The goal is to find the shortest possible route that visits all cities exactly once and returns to the starting city. 
