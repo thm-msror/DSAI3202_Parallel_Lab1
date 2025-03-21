@@ -262,7 +262,7 @@ Ensured all MPI processes terminate gracefully — fixing the hanging terminal i
 ## Large scale problem (10 pts)
 
 - Run the program using the extended city map: city_distances_extended.csv. Successful execution in feasible time.
-  - ![Improved performance metrics for distributed run](improved_distributed_metrics.png)
+  - ![Improved performance metrics for distributed run](extended_metrics.png)
 
 - How would you add more cars to the problem?
 1. Implementing Multiple Vehicles:
