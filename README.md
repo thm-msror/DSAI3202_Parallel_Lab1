@@ -173,8 +173,7 @@ There are several improvements that can be implemented in the algorithm.
 ## Parallel Version (Using Distributed mpi4py)
 
 6. Parallelize the code
-After running the code sequentially, the current part of the assignment requires you
-to run the code in parallel over multiple machines.
+After running the code sequentially and with multiprocessing, the current part of the assignment requires you to run the code in parallel over multiple machines.
 
 - Define the parts to be distributed and parallelized, explain your choices
 - Parallelize your program
