@@ -7,8 +7,8 @@ from multiprocessing import cpu_count
 from src.genetic_algorithms_functions import generate_unique_population
 from src.parallel_functions import worker_process, parallel_fitness
 
-def parallel_genetic_algorithm(distance_matrix, population_size=20000, generations=100,
-                               mutation_rate=0.2, num_tournaments=5, stagnation_limit=12, seed=42):
+def parallel_genetic_algorithm(distance_matrix, population_size=10000, generations=100,
+                               mutation_rate=0.1, num_tournaments=5, stagnation_limit=5, seed=42):
     """
     Runs a parallel version of a Genetic Algorithm (GA) for solving the Fleet Management Problem.
     

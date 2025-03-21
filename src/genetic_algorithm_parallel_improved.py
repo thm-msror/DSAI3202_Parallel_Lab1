@@ -11,11 +11,11 @@ from src.parallel_functions_improved import worker_process, parallel_fitness, ve
 
 def parallel_genetic_algorithm_improved(
         distance_matrix, 
-        population_size=20000, 
+        population_size=10000, 
         generations=100,
-        mutation_rate=0.2, 
+        mutation_rate=0.1, 
         num_tournaments=5, 
-        stagnation_limit=10,
+        stagnation_limit=5,
         early_stopping_threshold=None, 
         elite_size=5, 
         convergence_patience=10, 
