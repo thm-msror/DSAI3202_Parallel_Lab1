@@ -1,3 +1,4 @@
+#sec/parallel_functions.py
 import numpy as np
 import random
 from src.genetic_algorithms_functions import calculate_fitness, order_crossover, mutate

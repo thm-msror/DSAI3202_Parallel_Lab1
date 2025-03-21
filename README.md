@@ -87,8 +87,11 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
 - **Below is a critical section of the parallel implementation:**
 
 ```python
- with ProcessPoolExecutor(max_workers=num_procs) as executor:
+ # Step 2: Start parallel pool
+    with ProcessPoolExecutor(max_workers=num_procs) as executor:
         for gen in range(1, generations + 1):
+
+            # Handle stagnation: Regenerate population if no improvement
             if stagnation_counter >= stagnation_limit:
                 print(f"Regenerating population at generation {gen} due to stagnation")
                 population = np.array(
@@ -96,29 +99,34 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
                 )
                 stagnation_counter = 0
 
+            # Safety check: ensure correct population size
             if population.shape[0] != population_size:
                 population = np.array(
                     generate_unique_population(population_size - 1, distance_matrix.shape[0]) + [best_solution]
                 )
 
+            # Step 3: Split population into chunks for parallel workers
             chunks = np.array_split(population, num_procs)
-            chunks = [chunk.tolist() for chunk in chunks]
+            chunks = [chunk.tolist() for chunk in chunks]  # Convert to lists for multiprocessing
 
-            # Worker: fitness + selection + crossover + mutation
+            # Step 4: Submit parallel tasks (each worker handles fitness + selection + crossover + mutation)
             futures = [
                 executor.submit(worker_process, chunk, distance_matrix, mutation_rate, num_tournaments)
                 for chunk in chunks
             ]
-            results = [f.result() for f in futures]
+            results = [f.result() for f in futures]  # Wait for all workers to finish
+
+            # Step 5: Collect offspring and fitness values from all workers
             offspring_chunks, fitness_chunks = zip(*results)
-            population = np.array(list(chain.from_iterable(offspring_chunks)))
+            population = np.array(list(chain.from_iterable(offspring_chunks)))  # Flatten offspring
 ```
 
-- `from itertools import chain flattens the list of lists efficiently, it’s used to:`
-    - Merge the offspring returned from multiple worker processes
-    - Merge their fitness scores into one array
-    - This ensures the next generation operates on a clean, unified population.
-    - Added due to the scalar array and index out of bound errors.
+`from itertools import chain flattens the list of lists efficiently, it’s used to:`
+
+- Merge the offspring returned from multiple worker processes
+- Merge their fitness scores into one array
+- This ensures the next generation operates on a clean, unified population.
+- Added due to the scalar array and index out of bound errors.
 
 - **ProcessPoolExecutor:** Manages a pool of worker processes to which tasks can be submitted. It handles the distribution of tasks and collection of results.
 - **Chunking the Population:** The population is split into smaller subsets (chunks), each assigned to a different worker process. This division enables parallel processing of these subsets, improving efficiency.
@@ -137,7 +145,29 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
 There are several improvements that can be implemented in the algorithm.
 
 - What improvements do you propose? Add them to your code.
+
+  - Elitism: Retains best individuals across generations.
+  - Adaptive mutation rate: Mutation decreases as generations progress.
+  - Early stopping: Stops if a satisfactory solution is found.
+  - Convergence detection: Stops if no significant improvement in recent generations.
+  - Vectorized fitness: Uses fast NumPy operations to compute distances.
+
+| Problem in Base Version                          | Solution in Improved Version                                                                                   |
+|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| High overhead in fitness calculation             | Used `vectorized_fitness()` to minimize per-individual computation                                         |
+| Fixed mutation rate led to early stagnation      | Introduced `adaptive mutation rate` to maintain diversity early and reduce noise later                     |
+| No protection for best solutions                 | Implemented `elitism` to ensure best individuals are preserved across generations                          |
+| Only stagnation used for early exit              | Added `early convergence detection` (based on no improvement over X generations) + early stopping threshold |
+| Execution time was long despite parallelism      | Reduced overhead by combining operations in `worker_process()` and avoiding large shared memory transfers   |
+
 - After adding your improvements, recompute the performance metrics and compare with before the enhancements.
+
+  - ![Performance metrics for improved run of multiprocessing](improved_mp_metrics.png)
+  - The base multiprocessing version produced better routes than the sequential version but suffered from overhead and communication latency.
+  - The improved version achieved the best of both worlds:
+    - Higher-quality solutions (lowest route distance)
+    - Faster execution (more than 2x faster than base parallel)
+  - These improvements make the algorithm scalable, robust, and efficient for larger problem sizes.
 
 ---
 
