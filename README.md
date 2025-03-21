@@ -176,8 +176,54 @@ There are several improvements that can be implemented in the algorithm.
 After running the code sequentially and with multiprocessing, the current part of the assignment requires you to run the code in parallel over multiple machines.
 
 - Define the parts to be distributed and parallelized, explain your choices
+  - The **Genetic Algorithm (GA)** process was broken down into the following components:
+    - **Population Initialization**: Only done by Rank 0.
+    - **Fitness Evaluation**: The most computationally intensive part, distributed across all machines.
+    - **Selection, Crossover, Mutation**: Performed locally on each node for their assigned population chunk.
+    - **Best Individual Gathering**: Each node computes its local best, which is sent to Rank 0 to identify the global best.
+    - **Broadcasting the Best**: Rank 0 broadcasts the current global best individual and its fitness to all nodes.
+    - **Early Stopping**: Triggered on Rank 0 and broadcast to all nodes based on stagnation threshold.
+
+**Why these parts?**
+
+- Fitness evaluation is the bottleneck, so parallelizing it significantly reduces execution time.
+- Selection, crossover, and mutation are local operations that can run independently on each machine.
+- Aggregating global best ensures global convergence while preserving decentralization for speed.
+
 - Parallelize your program
+The code was modified to use `mpi4py` as follows:
+
+- Used `MPI.COMM_WORLD` to identify each process by rank and split the total population.
+- Rank 0:
+  - Initializes the full population.
+  - Distributes equal chunks to all ranks using `comm.scatter`.
+  - Gathers best individuals from all ranks using `comm.gather` and evaluates the global best.
+  - Broadcasts best results to all ranks.
+- All Ranks:
+  - Receive their chunk of population.
+  - Perform local fitness evaluation and genetic operations (selection, crossover, mutation).
+  - Share results with Rank 0 using `comm.gather` and `comm.allgather`.
+
+The main distributed GA logic is encapsulated in:
+
+- `src/genetic_algorithm_distributed.py` — Handles all MPI-based coordination and computation.
+- `src/distributed_utils.py` — Contains fitness and evolution logic (vectorized for speed).
+
+Synchronization:
+
+- `comm.Barrier()` ensures all nodes terminate cleanly to avoid hanging processes.
+
+DeprecationWarnings were silenced using Python’s `warnings` module for clean output.
+
 - Run your code and compute the performance metrics
+To run the distributed version on multiple machines with `mpi4py`:
+
+```bash
+mpirun -hostfile machines.txt -n 24 python main_distributed.py
+```
+
+- Each machine contributed 6 processes (cores). The hostfile machines.txt included 4 machines, totaling 24 MPI processes.
+- ![Performance metrics for distributed run](distributed_metrics.png)
 
 7. Enhance the algorithm
 There are several improvements that can be implemented in the algorithm.
