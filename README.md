@@ -90,7 +90,7 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
  with ProcessPoolExecutor(max_workers=num_procs) as executor:
         for gen in range(1, generations + 1):
             if stagnation_counter >= stagnation_limit:
-                print(f"🔄 Regenerating population at generation {gen} due to stagnation")
+                print(f"Regenerating population at generation {gen} due to stagnation")
                 population = np.array(
                     generate_unique_population(population_size - 1, distance_matrix.shape[0]) + [best_solution]
                 )
@@ -116,10 +116,10 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
 
 `from itertools import chain flattens the list of lists efficiently, it’s used to:`
 
-- Merge the offspring returned from multiple worker processes
-- Merge their fitness scores into one array
-- This ensures the next generation operates on a clean, unified population.
-- Added due to the scalar array and index out of bound errors.
+  - Merge the offspring returned from multiple worker processes
+  - Merge their fitness scores into one array
+  - This ensures the next generation operates on a clean, unified population.
+  - Added due to the scalar array and index out of bound errors.
 
 - **ProcessPoolExecutor:** Manages a pool of worker processes to which tasks can be submitted. It handles the distribution of tasks and collection of results.
 - **Chunking the Population:** The population is split into smaller subsets (chunks), each assigned to a different worker process. This division enables parallel processing of these subsets, improving efficiency.
