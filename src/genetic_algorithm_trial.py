@@ -1,3 +1,4 @@
+#src/genetic_algorithm_trial.py
 import numpy as np
 import pandas as pd
 import time
@@ -83,13 +84,14 @@ def run_genetic_algorithm(distance_matrix, population_size=10000, num_tournament
         print(f"Generation {generation}: Best calculate_fitness = {current_best_calculate_fitness}")
 
     # Update calculate_fitness_values for the final population
-    calculate_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+    calculate_fitness_values = np.array([-calculate_fitness(route, distance_matrix) for route in population])
 
     # Output the best solution
     best_idx = np.argmin(calculate_fitness_values)
     best_solution = population[best_idx]
     end_time = time.time() #end timing
     print("Best Solution:", best_solution)
-    print("Total Distance:", calculate_fitness(best_solution, distance_matrix))
+    print("Total Distance:", -calculate_fitness(best_solution, distance_matrix))
+    total_distance = -calculate_fitness(best_solution, distance_matrix)
     
-    return end_time - start_time
+    return total_distance, end_time - start_time
