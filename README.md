@@ -121,12 +121,11 @@ We employed Python’s `concurrent.futures.ProcessPoolExecutor` to distribute ta
             population = np.array(list(chain.from_iterable(offspring_chunks)))  # Flatten offspring
 ```
 
-`from itertools import chain flattens the list of lists efficiently, it’s used to:`
-
-- Merge the offspring returned from multiple worker processes
-- Merge their fitness scores into one array
-- This ensures the next generation operates on a clean, unified population.
-- Added due to the scalar array and index out of bound errors.
+- `from itertools import chain flattens the list of lists efficiently, it’s used to:`
+  - Merge the offspring returned from multiple worker processes
+  - Merge their fitness scores into one array
+  - This ensures the next generation operates on a clean, unified population.
+  - Added due to the scalar array and index out of bound errors.
 
 - **ProcessPoolExecutor:** Manages a pool of worker processes to which tasks can be submitted. It handles the distribution of tasks and collection of results.
 - **Chunking the Population:** The population is split into smaller subsets (chunks), each assigned to a different worker process. This division enables parallel processing of these subsets, improving efficiency.
