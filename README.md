@@ -223,13 +223,69 @@ mpirun -hostfile machines.txt -n 24 python main_distributed.py
 ```
 
 - Each machine contributed 6 processes (cores). The hostfile machines.txt included 4 machines, totaling 24 MPI processes.
-- ![Performance metrics for distributed run](distributed_metrics.png)
+  - ![Performance metrics for initial run of sequential and multiprocessing using extended city map](extended_metrics.png)
+  - Ran correclty for the first run, after which it kept providing numpy core outdated errors and warning, due to one of the machines.
+  - Therefore, we reduced the machines to 3, including mine, and changed the n to 12, for the improved run below.
 
 7. Enhance the algorithm
 There are several improvements that can be implemented in the algorithm.
 
 - Distribute your algorithm over 2 machines or more
+  - Final distribution command:
+
+  ```bash
+  mpirun -hostfile machines.txt -n 12 python main_distributed.py
+  ```
+
 - What improvements do you propose? Add them to your code
+While these enhancements worked well in the **sequential** and **multiprocessing** versions, they were **not retained in the final distributed implementation** due to the following issues:
+
+| Improvement Tried                  | Result                                                                 |
+|-----------------------------------|------------------------------------------------------------------------|
+| Adaptive Mutation Rate            | Slower runtime due to mutation-rate syncing across all MPI processes   |
+| Early Stopping by Fitness Average | Caused premature termination, limiting exploration in parallel setting |
+| Stagnation + Avg Fitness Check    | No measurable improvement in performance or path quality               |
+
+### Improvements added were
+
+**Stagnation-Based Early Stopping**  
+A simple early stopping mechanism based on no improvement over `stagnation_limit` generations was retained to prevent unnecessary iterations.
+**`comm.Barrier()` for Clean Termination**  
+Ensured all MPI processes terminate gracefully — fixing the hanging terminal issue observed in early runs.
+
 - After adding your improvements, recompute the performance metrics and compare with before the enhancements
+  - ![Improved performance metrics for distributed run](improved_distributed_metrics.png)
+  - Since, only minimum improvements were added, we do not see a significant change, except for effeciency.
+
+---
+
+## Large scale problem (10 pts)
+
+- Run the program using the extended city map: city_distances_extended.csv. Successful execution in feasible time.
+  - ![Improved performance metrics for distributed run](improved_distributed_metrics.png)
+
+- How would you add more cars to the problem?
+1. Implementing Multiple Vehicles:
+- Incorporating multiple vehicles transforms the problem into the Capacitated Vehicle Routing Problem (CVRP), where each vehicle has a capacity constraint, and the goal is to minimize the total distance traveled while servicing all customers.​
+
+a. Problem Formulation:
+- Capacity Constraints: Each vehicle has a maximum load it can carry, and each customer has a specific demand. 
+- The sum of demands in any vehicle's route should not exceed its capacity.​
+
+b. Genetic Representation:
+- Chromosome Structure: Represent each chromosome as a sequence of routes, where each route corresponds to a vehicle's path starting and ending at the depot (node 0).
+- For example, a chromosome could be represented as [[0, 2, 5, 0], [0, 3, 4, 0], [0, 1, 6, 0]], indicating three routes for three vehicles.​
+
+c. Fitness Evaluation:
+- Fitness Function: Calculate the total distance traveled by all vehicles. 
+- If any vehicle's route exceeds its capacity, apply a penalty to the fitness score to discourage infeasible solutions.​
+
+d. Genetic Operators:
+- Crossover: Design crossover operators that exchange sub-routes between parent chromosomes while maintaining feasibility concerning vehicle capacities.​
+- Mutation: Implement mutation operators that adjust routes by reassigning customers between vehicles or altering the sequence of visits within a route.​
+
+e. Initialization:
+- Clustering Techniques: Use clustering methods (e.g., k-means) to group geographically close customers, assigning each cluster to a vehicle. 
+- This approach provides a good starting point for the GA.
 
 ---
