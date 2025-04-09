@@ -1,7 +1,8 @@
 # AWS Virtual Machine Lab Setup
 ---
 ## Overview
-This lab involves setting up a Virtual Machine (VM) on a cloud service, configuring it, and installing necessary tools like Anaconda, mpi4py, Celery, and Docker. The setup is done using the xlarge template for the VM, and SSH access will be configured using a newly created key pair.
+
+This lab involves setting up a Virtual Machine (VM) on a cloud service, configuring it, and installing necessary tools like Anaconda, mpi4py, Celery, and Docker. The setup uses the large template for the VM, and SSH access will be configured using a newly created key pair.
 ---
 ### Requirements
 - Cloud VM Setup:
