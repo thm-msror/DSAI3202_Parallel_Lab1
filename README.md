@@ -111,7 +111,7 @@ To support parallel maze exploration, the original single-explorer program was e
   - Average moves per second
 - Identifies the best single run (i.e., explorer with the lowest number of moves).
 - Prints a summary report, helping determine which maze type and explorer performed best.
-- ![q2.png]
+- ![Maze metrics](q2.png)
 
 **To run the parallel program `dispatch_explorers.py` follow the instructions:**
 
@@ -146,8 +146,10 @@ In order to analyze and compare the performance of 4 maze explorers simultaneous
 
 To collect and compare the metrics for each explorer, lets adds to the dispatch_explorers.py program to provide metrcis for all runs in addition to the average summary statistics.
 
-- ![q3.png]
-- The metrics for each explorer shows: 1
+- ![Maze metrics](q3.png)
+
+
+The metrics for each explorer shows: 
 
 1. **Consistency in moves** - All explorers completed the maze with the same number of moves (1279), indicating they likely followed the same path-finding algorithm and encountered the same maze layout. However, the same number of moves taken by each explorer indicate no improvement, suggesting that **the right-hand rule does not guarantee the shortest path**.
 2. **Highlighting the ineffeciency** - 1279 moves in a 30x30 maze (which has only 900 cells) implies a non-optimal path — this is of concern.
