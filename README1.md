@@ -68,6 +68,38 @@ Modify the main program to run multiple maze explorers simultaneously. This is b
 2. Design a parallel execution system
 3. Implement task distribution
 4. Create a results comparison system
+
+### Answer 2 (30 points)
+To support parallel maze exploration, the original single-explorer program was extended to launch and manage multiple maze explorers concurrently. This was achieved using Celery, a distributed task queue framework, along with RabbitMQ as the message broker and Redis as the results backend.
+
+1. The parallel execution system is implemented using Celery tasks (explore_task) in explorer_tasks.py.
+
+2. Each task creates a maze, runs the explorer without visualization (visualize=False), and returns performance statistics.
+
+3. The file dispatch_explorers.py schedules N=10 explorers per maze type (e.g., random, static) to run asynchronously using explore_task.delay(), enabling true concurrent execution across CPU cores or distributed machines.
+
+4. Celery uses RabbitMQ to queue tasks and distribute them to available worker processes.
+
+5. Each worker handles one maze exploration, allowing horizontal scalability.
+
+6. Redis is used as a result backend to store and retrieve exploration results reliably.
+
+7. Once all tasks are complete, the dispatch_explorers.py script performs the following:
+- Collects all results using result.get() which blocks until each task finishes.
+- Groups results by maze type (e.g., random, static) using a defaultdict.
+- Computes average statistics for each group:
+   - Average time taken
+   - Average number of moves
+   - Average number of backtracks
+   - Average moves per second
+- Identifies the best single run (i.e., explorer with the lowest number of moves).
+- Prints a summary report, helping determine which maze type and explorer performed best.
+- ![q2.png]
+
+**To run the parallel program `dispatch_explorers.py` follow the instructions:**
+1. Run RabbitMQ on PC cmd using the command `ssh -L 15672:localhost:15672 user@ip_address`
+2. Run `celery -A explorer_tasks --loglevel=info` in VS code terminal
+3. In Another VS code terminal run `python dispatch_explorers.py`
 ---
 
 ### Question 3 (10 points)
@@ -81,6 +113,26 @@ Analyze and compare the performance of different maze explorers on the static ma
      - Number of backtrack operations
 
 3. What do you notice regarding the performance of the explorers? Explain the results and the observations you made.
+
+### Answer 3 (10 points)
+In order to analyze and compare the performance of 4 maze explorers simultaneously on the static maze of (30:30), I changed the dispatch_explorers to:
+```
+1. Set number of explorers per maze type
+    N = 4
+    maze_types = ['static']
+```
+To collect and compare the metrics for each explorer, lets adds to the dispatch_explorers.py program to provide metrcis for all runs in addition to the average summary statistics.
+- ![q3.png] 
+- The metrics for each explorer shows: 1
+1. **Consistency in moves** - All explorers completed the maze with the same number of moves (1279), indicating they likely followed the same path-finding algorithm and encountered the same maze layout. However, the same number of moves taken by each explorer indicate no improvement, suggesting that **the right-hand rule does not guarantee the shortest path**.
+2. **Highlighting the ineffeciency** - 1279 moves in a 30x30 maze (which has only 900 cells) implies a non-optimal path — this is of concern.
+3. **No Backtracks** - None of the explorers needed to backtrack. While this might seem efficient, it also implies the algorithm might avoid re-evaluating paths that could be shorter — again pointing to the right-hand rule's limitations.
+4. **Time Taken** - The time taken per explorer ranged between 0.00119s and 0.00158s. This variance is negligible and likely due to OS-level scheduling rather than any meaningful performance difference.
+4. **Moves per second** - Ranged from ~807,000 to ~1,072,000. Although this sounds impressive, the high number of moves needed shows that speed is masking inefficiency. In other words, the explorers are fast — but not smart.
+**Explorer 4 achieved the highest throughput - taking the least amount of times with the same number of moves as all other explorers.**
+
+This analysis reveals that the explorers' strategy — a deterministic wall-following rule called the right-hand rule — leads to consistent but suboptimal performance. While all explorers reached the goal, they took significantly more steps than necessary, suggesting a lack of path optimization.
+
 ---
 
 ### Question 4 (20 points)
