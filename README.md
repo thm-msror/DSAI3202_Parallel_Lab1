@@ -167,25 +167,25 @@ This analysis reveals that the explorers' strategy — a deterministic wall-foll
 Based on your analysis from Question 3, propose and implement enhancements to the maze explorer to overcome its limitations. Your solution should:
 
 1. Identify and explain the main limitations of the current explorer:
-* 1. Non-optimal path: The right‑hand rule “hugs” one wall and often winds through loops and long corridors, resulting in ~1279 steps in a 30×30 maze—far above the true minimum (~128). 
-* 2. No global awareness: It only considers its immediate neighbors and doesn’t remember which direction actually leads closer to the goal, so it revisits cells unnecessarily.
-* 3. Ineffecient on Perfect maze: Perfect (loop‑free) mazes are trees—wall‑following must traverse every branch before finding the exit, exploring O(n) cells in the worst case.
-* 4. Unbounded backtracking: When stuck, it backtracks to the last junction—but that can still retrace large portions of the maze repeatedly.
+  1. Non-optimal path: The right‑hand rule “hugs” one wall and often winds through loops and long corridors, resulting in ~1279 steps in a 30×30 maze—far above the true minimum (~128). 
+  2. No global awareness: It only considers its immediate neighbors and doesn’t remember which direction actually leads closer to the goal, so it revisits cells unnecessarily.
+  3. Ineffecient on Perfect maze: Perfect (loop‑free) mazes are trees—wall‑following must traverse every branch before finding the exit, exploring O(n) cells in the worst case.
+  4. Unbounded backtracking: When stuck, it backtracks to the last junction—but that can still retrace large portions of the maze repeatedly.
 
 2. Propose specific improvements to the exploration algorithm:
 
 To guarantee shortest paths and avoid redundant exploration, we introduce two classic graph‑search methods:
 
-* 1. Breadth-First Search (BFS):
+  1. Breadth-First Search (BFS):
 - Guarantees the absolute shortest path (in number of steps) on an unweighted grid.
 - Explores layer by layer, never revisiting a cell. 
 
-* 2. A* Search with Manhattan Heuristic:
+  2. A* Search with Manhattan Heuristic:
 - Uses a heuristic (Manhattan distance) to guide the search toward the goal.
 - Still optimal if the heuristic is admissible, but explores far fewer nodes than plain BFS on large grids. 
 
-3. Implement at least two of the proposed improvements:
-Implemented in the src folder, BFS search has been implemented in `explorer_bfs.py` and A* search with manhattan distance has been implemented in `explorer_aStar.py`.
+  3. Implement at least two of the proposed improvements:
+- Implemented in the src folder, BFS search in `explorer_bfs.py` and A* search with manhattan distance in `explorer_aStar.py`.
 
 ### Key differences vs. the original right‑hand rule:
 
