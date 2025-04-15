@@ -178,7 +178,7 @@ To guarantee shortest paths and avoid redundant exploration, we introduce two cl
 * 1. Breadth-First Search (BFS):
 - Guarantees the absolute shortest path (in number of steps) on an unweighted grid.
 - Explores layer by layer, never revisiting a cell.
-- 
+
 * 2. A* Search with Manhattan Heuristic:
 - Uses a heuristic (Manhattan distance) to guide the search toward the goal.
 - Still optimal if the heuristic is admissible, but explores far fewer nodes than plain BFS on large grids. 
