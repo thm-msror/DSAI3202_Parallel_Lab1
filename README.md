@@ -233,7 +233,15 @@ Your answer should include:
 
 **Visualizations created to show the improvements:**
 
-- The visualizations are created using the pygame feature, we have discovered before in the jupyter notebook file, using the `visualize='False'` or `visualize='True'` feature.
+- The visualizations are created using the `visualization.py` in the src folder. 
+- All three classes (JupyterExplorer, JupyterBFSExplorer, JupyterAStarExplorer) share the same draw_state(final) method for rendering.
+- They differ only in the solve() implementation:
+  - JupyterExplorer uses the right‑hand wall‑following rule with occasional backtracking.
+  - JupyterBFSExplorer uses breadth‑first search for the shortest unweighted path.
+  - JupyterAStarExplorer uses A* with an admissible heuristic for faster convergence.
+
+- The three different visualizations have been implemented in the `maze_visualization.ipynb` at the end of the file under the title 'Visualizing Improvements of the BFS explorer and A* explorer'. 
+- The cells need to be run to see the animation visulization of the original wall-following explorer, bfs explorer and A* explorer solving a 30x30 static maze with one explorer only.
 
 **Discussion of any tradeoffs or new limitations introduced:**
 

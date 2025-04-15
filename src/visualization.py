@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
 from .constants import WINDOW_SIZE, CELL_SIZE, WHITE, BLACK, RED, GREEN, BLUE
 from .explorer import Explorer
+import heapq
+from collections import deque
 
 
 def visualize_maze(maze, screen):
@@ -107,3 +109,99 @@ class JupyterExplorer(Explorer):
         
         # Clear the output for the next frame
         clear_output(wait=True) 
+
+class JupyterBFSExplorer(JupyterExplorer):
+    """
+    Visualize BFS pathfinding in a Jupyter notebook.
+    Finds the shortest path, then animates it step by step.
+    """
+    def solve(self):
+        start = self.maze.start_pos
+        end   = self.maze.end_pos
+
+        # 1. BFS to find the shortest path
+        queue   = deque([(start, [start])])
+        visited = {start}
+        t0      = time.time()
+        path    = []
+
+        while queue:
+            pos, p = queue.popleft()
+            if pos == end:
+                path = p
+                break
+            x, y = pos
+            for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+                nxt = (x+dx, y+dy)
+                if (0 <= nxt[0] < self.maze.width and
+                    0 <= nxt[1] < self.maze.height and
+                    self.maze.grid[nxt[1]][nxt[0]] == 0 and
+                    nxt not in visited):
+                    visited.add(nxt)
+                    queue.append((nxt, p + [nxt]))
+
+        t1 = time.time()
+        time_taken = t1 - t0
+
+        # 2. Animate the final path
+        for x, y in path:
+            self.x, self.y = x, y
+            self.draw_state()
+
+        return time_taken, path
+
+
+class JupyterAStarExplorer(JupyterExplorer):
+    """
+    Visualize A* (Manhattan heuristic) pathfinding in a Jupyter notebook.
+    Finds the shortest path, then animates it step by step.
+    """
+    def _h(self, a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def solve(self):
+        start = self.maze.start_pos
+        end   = self.maze.end_pos
+
+        # 1. A* to find the shortest path
+        open_set = [(self._h(start, end), 0, start, [start])]
+        g_score  = {start: 0}
+        visited  = set()
+        t0       = time.time()
+        path     = []
+
+        while open_set:
+            f, g, pos, p = heapq.heappop(open_set)
+            if pos in visited:
+                continue
+            visited.add(pos)
+
+            if pos == end:
+                path = p
+                break
+
+            x, y = pos
+            for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+                nxt = (x+dx, y+dy)
+                if (0 <= nxt[0] < self.maze.width and
+                    0 <= nxt[1] < self.maze.height and
+                    self.maze.grid[nxt[1]][nxt[0]] == 0):
+                    tentative_g = g + 1
+                    if tentative_g < g_score.get(nxt, float('inf')):
+                        g_score[nxt] = tentative_g
+                        heapq.heappush(open_set, (
+                            tentative_g + self._h(nxt, end),
+                            tentative_g,
+                            nxt,
+                            p + [nxt]
+                        ))
+
+        t1 = time.time()
+        time_taken = t1 - t0
+
+        # 2. Animate the final path
+        for x, y in path:
+            self.x, self.y = x, y
+            self.draw_state()
+
+        return time_taken, path
