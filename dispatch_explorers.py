@@ -1,60 +1,68 @@
+# dispatch_explorers.py
+
 """
 dispatch_explorers.py
 
-This script dispatches multiple parallel maze explorers using Celery.
-It launches N explorers per maze type, collects their results, computes statistics,
-and prints a summary including the best run.
+Dispatches multiple maze-solving tasks in parallel via Celery,
+then collects, groups, and compares their performance statistics.
 """
 
-from explorer_tasks import explore_task  # Celery task
-from collections import defaultdict      # for grouping results
+from explorer_tasks import explore_original, explore_bfs, explore_astar
+from collections import defaultdict
 
 def main():
-    # 1. Set number of explorers per maze type
+    # Number of runs per algorithm
     N = 4
-    maze_types = ['static']
+    maze_type = 'static'
 
-    # 2. Launch all Celery tasks asynchronously
-    async_results = []
-    for mtype in maze_types:
-        for i in range(N):
-            async_results.append(explore_task.delay(mtype))  # fire off task to worker queue
+    # 1. Fire off all tasks
+    tasks = []
+    for _ in range(N):
+        tasks.append(explore_original.delay(maze_type))
+        tasks.append(explore_bfs.delay(maze_type))
+        tasks.append(explore_astar.delay(maze_type))
 
-    # 3. Wait for all tasks to complete and collect results
-    results = [r.get() for r in async_results]  # blocks until task is complete
+    # 2. Collect results (blocks until each finishes)
+    results = [t.get() for t in tasks]
 
-    # 4. Group results by maze type
+    # === Print individual explorer run metrics ===
+    print("\n=== Individual Explorer Runs ===")
+    for idx, r in enumerate(results, start=1):
+        print(f"\nRun {idx} ({r['maze_type']}): "
+              f"Time: {r['time_taken']:.6f}s, "
+              f"Moves: {r['moves']}, "
+              f"Backtracks: {r['backtracks']}, "
+              f"Moves/sec: {r['moves_per_sec']:.1f}")
+
+    # 3. Group by algorithm name
     grouped = defaultdict(list)
     for r in results:
         grouped[r['maze_type']].append(r)
-        
-    # 5. Print individual explorer run results ===
-    print("\n=== Individual Explorer Runs ===")
-    for mtype, runs in grouped.items():
-        for i, r in enumerate(runs, 1):
-            print(f"[{mtype.capitalize()}] Explorer {i}: Time: {r['time_taken']:.5f}s, "
-                  f"Moves: {r['moves']}, Backtracks: {r['backtracks']}, "
-                  f"Moves/sec: {r['moves_per_sec']:.5f}")
 
-    # 6. Print summary statistics
-    print("\n=== Summary Statistics ===")
-    for mtype, runs in grouped.items():
-        avg_time   = sum(r['time_taken']    for r in runs) / len(runs)
-        avg_moves  = sum(r['moves']         for r in runs) / len(runs)
-        avg_back   = sum(r['backtracks']    for r in runs) / len(runs)
-        avg_mps    = sum(r['moves_per_sec'] for r in runs) / len(runs)
+    # 4. Print aggregated summary
+    print(f"\n=== Performance on '{maze_type}' Maze ===")
+    for algo, runs in grouped.items():
+        # Compute averages
+        avg_t   = sum(r['time_taken']    for r in runs) / len(runs)
+        avg_m   = sum(r['moves']         for r in runs) / len(runs)
+        avg_b   = sum(r['backtracks']    for r in runs) / len(runs)
+        avg_mps = sum(r['moves_per_sec'] for r in runs) / len(runs)
 
-        print(f"\nMaze Type: {mtype}")
-        print(f"  Explorer (s):     {len(runs)}")
-        print(f"  Avg time (s):     {avg_time:.5f}")
-        print(f"  Avg moves:        {avg_moves:.5f}")
-        print(f"  Avg backtracks:   {avg_back:.1f}")
-        print(f"  Avg moves/sec:    {avg_mps:.5f}")
+        print(f"\nAlgorithm: {algo}")
+        print(f"  Runs:             {len(runs)}")
+        print(f"  Avg time (s):     {avg_t:.6f}")
+        print(f"  Avg moves:        {avg_m:.1f}")
+        print(f"  Avg backtracks:   {avg_b:.1f}")
+        print(f"  Avg moves/sec:    {avg_mps:.1f}")
 
-    # 7. Find and display the best single run (lowest moves)
+    # 5. Identify and print the single best run (fewest moves)
     best = min(results, key=lambda r: r['moves'])
     print("\n=== Best Single Run ===")
-    print(f"Type: {best['maze_type']}, Moves: {best['moves']}, Time: {best['time_taken']:.5f}s, Backtracks: {best['backtracks']}")
+    print(f"Algorithm: {best['maze_type']}")
+    print(f"  Moves:          {best['moves']}")
+    print(f"  Time:           {best['time_taken']:.6f}s")
+    print(f"  Backtracks:     {best['backtracks']}")
+    print(f"  Moves/sec:      {best['moves_per_sec']:.1f}")
 
 if __name__ == "__main__":
     main()

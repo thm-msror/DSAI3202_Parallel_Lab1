@@ -116,7 +116,7 @@ To support parallel maze exploration, the original single-explorer program was e
 **To run the parallel program `dispatch_explorers.py` follow the instructions:**
 
 1. Run RabbitMQ on PC cmd using the command `ssh -L 15672:localhost:15672 user@ip_address`
-2. Run `celery -A explorer_tasks --loglevel=info` in VS code terminal
+2. Run `celery -A explorer_tasks worker --loglevel=info` in VS code terminal
 3. In Another VS code terminal run `python dispatch_explorers.py`
 
 ---
@@ -167,16 +167,33 @@ This analysis reveals that the explorers' strategy — a deterministic wall-foll
 Based on your analysis from Question 3, propose and implement enhancements to the maze explorer to overcome its limitations. Your solution should:
 
 1. Identify and explain the main limitations of the current explorer:
+* 1. Non-optimal path: The right‑hand rule “hugs” one wall and often winds through loops and long corridors, resulting in ~1279 steps in a 30×30 maze—far above the true minimum (~128). 
+* 2. No global awareness: It only considers its immediate neighbors and doesn’t remember which direction actually leads closer to the goal, so it revisits cells unnecessarily.
+* 3. Ineffecient on Perfect maze: Perfect (loop‑free) mazes are trees—wall‑following must traverse every branch before finding the exit, exploring O(n) cells in the worst case.
+* 4. Unbounded backtracking: When stuck, it backtracks to the last junction—but that can still retrace large portions of the maze repeatedly.
 
 2. Propose specific improvements to the exploration algorithm:
 
+To guarantee shortest paths and avoid redundant exploration, we introduce two classic graph‑search methods:
+
+* 1. Breadth-First Search (BFS):
+- Guarantees the absolute shortest path (in number of steps) on an unweighted grid.
+- Explores layer by layer, never revisiting a cell. 
+
+* 2. A* Search with Manhattan Heuristic:
+- Uses a heuristic (Manhattan distance) to guide the search toward the goal.
+- Still optimal if the heuristic is admissible, but explores far fewer nodes than plain BFS on large grids. 
+
 3. Implement at least two of the proposed improvements:
+Implemented in the src folder, BFS search has been implemented in `explorer_bfs.py` and A* search with manhattan distance has been implemented in `explorer_aStar.py`.
 
-Your answer should include:
+### Key differences vs. the original right‑hand rule:
 
-1. A detailed explanation of the identified limitations
-2. Documentation of your proposed improvements
-3. The modified code with clear comments explaining the changes
+- Global vs. local: BFS/A* maintain a full visited set to never re‑enter a cell, whereas the right‑hand rule only looks back three steps for loops.
+
+- Guaranteed optimality: BFS finds the shortest path by layers; A* uses a heuristic to focus the search, both delivering the true minimum step count (≈109) instead of ~1279.
+
+- No ad‑hoc backtracking: Both algorithms expand new nodes in a systematic order and never “jump back” manually—they simply never revisit a node once it’s closed.
 
 ---
 
