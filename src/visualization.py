@@ -10,6 +10,7 @@ from IPython.display import display, clear_output
 from .constants import WINDOW_SIZE, CELL_SIZE, WHITE, BLACK, RED, GREEN, BLUE
 from .explorer import Explorer
 
+
 def visualize_maze(maze, screen):
     """
     Visualize a maze on the given screen.

@@ -3,12 +3,12 @@
 """
 explorer_tasks.py
 
-Defines Celery tasks for running different maze‐solving algorithms in parallel.
+Defines Celery tasks for running different maze-solving algorithms in parallel.
 Uses RabbitMQ as the broker and Redis as the result backend.
 
 Tasks:
-- explore_original: the wall‑following (right‑hand rule) explorer
-- explore_bfs:      the BFS (shortest‑path) explorer
+- explore_original: the wall-following (right-hand rule) explorer
+- explore_bfs:      the BFS (shortest-path) explorer
 - explore_astar:    the A* (heuristic) explorer
 
 Each task returns a dict with identical keys so they can be compared:

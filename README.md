@@ -148,8 +148,7 @@ To collect and compare the metrics for each explorer, lets adds to the dispatch_
 
 - ![Maze metrics](q3.png)
 
-
-The metrics for each explorer shows: 
+The metrics for each explorer shows:
 
 1. **Consistency in moves** - All explorers completed the maze with the same number of moves (1279), indicating they likely followed the same path-finding algorithm and encountered the same maze layout. However, the same number of moves taken by each explorer indicate no improvement, suggesting that **the right-hand rule does not guarantee the shortest path**.
 2. **Highlighting the ineffeciency** - 1279 moves in a 30x30 maze (which has only 900 cells) implies a non-optimal path — this is of concern.
@@ -167,7 +166,8 @@ This analysis reveals that the explorers' strategy — a deterministic wall-foll
 Based on your analysis from Question 3, propose and implement enhancements to the maze explorer to overcome its limitations. Your solution should:
 
 1. Identify and explain the main limitations of the current explorer:
-* 1. Non-optimal path: The right‑hand rule “hugs” one wall and often winds through loops and long corridors, resulting in ~1279 steps in a 30×30 maze—far above the true minimum (~128).
+
+- 1. Non-optimal path: The right‑hand rule “hugs” one wall and often winds through loops and long corridors, resulting in ~1279 steps in a 30×30 maze—far above the true minimum (~128).
   2. No global awareness: It only considers its immediate neighbors and doesn’t remember which direction actually leads closer to the goal, so it revisits cells unnecessarily.
   3. Ineffecient on Perfect maze: Perfect (loop‑free) mazes are trees—wall‑following must traverse every branch before finding the exit, exploring O(n) cells in the worst case.
   4. Unbounded backtracking: When stuck, it backtracks to the last junction—but that can still retrace large portions of the maze repeatedly.
@@ -175,18 +175,21 @@ Based on your analysis from Question 3, propose and implement enhancements to th
 2. Propose specific improvements to the exploration algorithm:
 To guarantee shortest paths and avoid redundant exploration, we introduce two classic graph‑search methods:
 
-* 1. Breadth-First Search (BFS):
+- 1. Breadth-First Search (BFS):
+
 - Guarantees the absolute shortest path (in number of steps) on an unweighted grid.
 - Explores layer by layer, never revisiting a cell.
 
-* 2. A* Search with Manhattan Heuristic:
+- 2. A* Search with Manhattan Heuristic:
+
 - Uses a heuristic (Manhattan distance) to guide the search toward the goal.
-- Still optimal if the heuristic is admissible, but explores far fewer nodes than plain BFS on large grids. 
+- Still optimal if the heuristic is admissible, but explores far fewer nodes than plain BFS on large grids.
 
 3. Implement at least two of the proposed improvements:
+
 - Implemented in the src folder, BFS search in `explorer_bfs.py` and A* search with manhattan distance in `explorer_aStar.py`.
 
-### Key differences vs. the original right‑hand rule:
+### Key differences vs. the original right‑hand rule
 
 - Global vs. local: BFS/A* maintain a full visited set to never re‑enter a cell, whereas the right‑hand rule only looks back three steps for loops.
 
@@ -204,10 +207,54 @@ Compare the performance of your enhanced explorer with the original:
 - Collect and compare all relevant metrics
 - Create visualizations showing the improvements
 - Document the trade-offs of your enhancements
+
 Your answer should include:
 
 1. Performance comparison results and analysis
 2. Discussion of any trade-offs or new limitations introduced
+
+### Answer 5
+
+**The output provided by `dispatch_explorers.py` shows the following:**
+
+- ![Program Output](q5_1.png)
+- ![Program Output](q5_2.png)
+
+**By analysing the output, we can conclude the following:**
+
+- **Path Length**:
+  - Both BFS and A* cut the step count by ~90% (from 1279 down to 127), achieving the true shortest path in the static maze.
+- **Runtime**:
+  - The original wall‑follower is fastest (≈1.27 ms) because it does very little bookkeeping.
+  - BFS and A* each take ≈2 ms, due to the overhead of managing queues/heaps and visited sets.
+- **Throughput**:
+  - Original “moves/sec” is very high (>1 million) because it counts many moves in a short time.
+  - BFS/A* show much lower throughput (~70 k moves/sec) simply because they execute far fewer moves overall—even though each move is costlier to compute.
+
+**Visualizations created to show the improvements:**
+
+- The visualizations are created using the pygame feature, we have discovered before in the jupyter notebook file, using the `visualize='False'` or `visualize='True'` feature.
+
+**Discussion of any tradeoffs or new limitations introduced:**
+
+1. Optimality vs. Speed
+
+- Pro: BFS/A* guarantee the shortest path, slashing moves by ~90%.
+- Con: Each step requires heavier data‑structure operations, so total runtime increases by ~50%.
+
+2. Memory Usage
+
+- The original explorer uses only a tiny fixed buffer (move_history of size 3) plus its path log.
+- BFS/A* store a full visited set (up to ~900 cells) and maintain either a queue of paths or a priority queue with g/f‑scores—this can become expensive on very large mazes.
+
+3. Complexity
+
+- Right‑hand rule is O(n) in the worst case but very low constant overhead.
+- BFS is O(n) too but with larger constants; A* is O(n log n) due to heap operations.
+
+4. Heuristic Dependence
+
+- A*s performance hinges on the quality of the Manhattan heuristic—if the maze had weighted edges or diagonal moves, we'd need to adapt or choose a different heuristic.
 
 ---
 
